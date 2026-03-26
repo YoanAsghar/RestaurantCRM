@@ -1,0 +1,37 @@
+//
+//Tables for the database
+//
+Usuario: {
+Id
+UserName
+Password
+Rol
+}
+
+Mesa: {
+Id
+PedidoActual: {
+ ...Productos
+ },
+
+}
+
+Ordenes: {
+Id
+Producto
+Valor
+(FOREIGN KEY) IdMesa
+Enum (En proceso, Cancelada, Completada)
+FechaI
+}
+
+Producto: {
+Id
+Precio
+Stock
+}
+
+//
+//Endpoint routes
+//
+
