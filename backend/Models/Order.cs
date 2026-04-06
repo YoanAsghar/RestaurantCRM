@@ -1,3 +1,6 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace RestaurantCRM.Models
 {
     public enum OrderStatus
@@ -6,6 +9,8 @@ namespace RestaurantCRM.Models
         Completed = 1,
         Canceled = 2
     }
+
+    [Table("orders")]
     public class Order
     {
         public int Id { get; set; }

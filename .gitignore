@@ -404,3 +404,5 @@ FodyWeavers.xsd
 
 # Local development
 appsettings.Development.json
+.env.
+z.txt
