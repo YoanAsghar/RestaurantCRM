@@ -6,12 +6,11 @@ import DomicilesContent from "./components/mainTabs/DomicilesContent";
 import InventoryContent from "./components/mainTabs/InventoryContent";
 import OrdersContent from "./components/mainTabs/OrdersContent";
 
+//Test imports
+import { testTables } from "./test_objects";
+
 const App = () => {
 const [currentTab, setCurretTab] = useState(BodyTabs.mesas);
-
-  useEffect(() => {
-    console.log(currentTab);
-  }, [currentTab])
 
   return (
     <div className="flex flex-row h-screen w-screen overflow-hidden">
@@ -19,7 +18,7 @@ const [currentTab, setCurretTab] = useState(BodyTabs.mesas);
 
       <section className="flex-1 h-full">
         <main className="w-full h-full">
-          {currentTab === BodyTabs.mesas && <TablesContent/>}
+          {currentTab === BodyTabs.mesas && <TablesContent tables={testTables}/>}
           {currentTab === BodyTabs.ordenes && <OrdersContent/>}
           {currentTab === BodyTabs.inventario && <InventoryContent/>}
           {currentTab === BodyTabs.domicilios && <DomicilesContent/>}
