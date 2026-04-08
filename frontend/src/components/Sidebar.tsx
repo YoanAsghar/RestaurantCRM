@@ -9,6 +9,7 @@ interface SideBarProps {
 
 const Sidebar = ({username, setTabChange, currentTab} : SideBarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const [selectedTab, setSelectedTab] = useState(1);
 
   return (
     <aside
@@ -23,28 +24,28 @@ const Sidebar = ({username, setTabChange, currentTab} : SideBarProps) => {
       {/* Menú */}
       <nav className="flex-1 py-2">
         <ul className="space-y-0.5">
-          <li onClick={() => setTabChange(BodyTabs.mesas)} className="flex flex-row items-center hover:bg-gray-100 px-3 py-3 rounded-lg cursor-pointer">
+          <li onClick={() => {setTabChange(BodyTabs.mesas); setSelectedTab(1)}} className={`flex flex-row items-center hover:bg-gray-100 px-3 py-3 rounded-lg cursor-pointer ${selectedTab === 1 ? "bg-purple-950" : ""}`}>
             <img className="size-6" src="./home_icon.png" alt="" />
             {!isCollapsed 
               ? ""
               : <a href="#" className="flex items-center gap-2 px-4 text-gray-700">Mesas</a>
             }
           </li>
-          <li onClick={() => setTabChange(BodyTabs.ordenes)} className="flex flex-row items-center hover:bg-gray-100 px-3 py-3 rounded-lg cursor-pointer">
+          <li onClick={() => {setTabChange(BodyTabs.ordenes); setSelectedTab(2)}} className={`flex flex-row items-center hover:bg-gray-100 px-3 py-3 rounded-lg cursor-pointer ${selectedTab === 2 ? "bg-purple-950 text-white" : ""}`}>
             <img className="size-6" src="./orders.png" alt="" />
             {!isCollapsed 
               ? ""
               : <a href="#" className="flex items-center gap-2 px-4 text-gray-700 ">Ordenes</a>
             }
           </li>
-          <li onClick={() => setTabChange(BodyTabs.inventario)} className="flex flex-row items-center hover:bg-gray-100 px-3 py-3 rounded-lg cursor-pointer">
+          <li onClick={() => {setTabChange(BodyTabs.inventario); setSelectedTab(3)}} className={`flex flex-row items-center hover:bg-gray-100 px-3 py-3 rounded-lg cursor-pointer ${selectedTab === 3 ? "bg-purple-950 text-white" : ""}`}>
             <img className="size-6" src="./inventory.png" alt="" />
             {!isCollapsed 
               ? ""
               : <a href="#" className="flex items-center gap-2 px-4 text-gray-700 ">Inventario</a>
             }
           </li>
-          <li onClick={() => setTabChange(BodyTabs.domicilios)} className="flex flex-row items-center hover:bg-gray-100 px-3 py-3 rounded-lg cursor-pointer">
+          <li onClick={() => {setTabChange(BodyTabs.domicilios); setSelectedTab(4)}} className={`flex flex-row items-center hover:bg-gray-100 px-3 py-3 rounded-lg cursor-pointer ${selectedTab === 4 ? "bg-purple-950 text-white" : ""}`}>
             <img className="size-6" src="./domiciles.png" alt="" />
             {!isCollapsed 
               ? ""

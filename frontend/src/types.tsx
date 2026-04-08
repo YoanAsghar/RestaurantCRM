@@ -21,7 +21,7 @@ export interface TableContentPrompts{
 
 export interface Table {
   id: number;
-  ordenActual: any[]; // Array of products
+  ordenActual: Product[]; // Array of products
   cantidadDePersonas: number;
   precioACobrar: number;
 }
@@ -33,4 +33,10 @@ export interface TableInformationProps{
 export interface TableCardProps {
   table: Table;
   onSelect: (id: number) => void;
+}
+
+export interface Product{
+  id: number;
+  name: string;
+  price: number;
 }

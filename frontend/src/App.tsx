@@ -1,8 +1,8 @@
 import { tables } from "./test_objects";
 //TESTS
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Sidebar from "./components/Sidebar";
-import { BodyTabs, type Table } from "./types";
+import { BodyTabs } from "./types";
 import DomicilesContent from "./components/mainTabs/DomicilesContent";
 import InventoryContent from "./components/mainTabs/InventoryContent";
 import OrdersContent from "./components/mainTabs/OrdersContent";
@@ -14,10 +14,6 @@ import TableInformation from "./components/mainTabs/tableInformation";
 const App = () => {
 const [currentTab, setCurrentTab] = useState(BodyTabs.mesas);
 const [currentTableSelectedId, setCurrentTableSelectedId] = useState<number>(tables[0].id);
-
-  useEffect(() => {
-    console.log(currentTableSelectedId);
-  }, [currentTableSelectedId]);
 
  const selectedTable = tables.find(t => t.id == currentTableSelectedId)
 
