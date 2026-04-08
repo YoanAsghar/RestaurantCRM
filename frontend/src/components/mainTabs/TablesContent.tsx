@@ -1,10 +1,8 @@
-import { colorPalette, type TableContentPrompts } from "../../types"
+import { colorPalette, type TableContentPrompts,type Table} from "../../types"
 import TableCards from "../TableCards"
 
-const TablesContent = ({tables}: TableContentPrompts) => {
+const TablesContent = ({tables, onSelect}: TableContentPrompts) => {
   return (
-    <div className="w-full h-full flex flex-row items-center justify-center">
-      {/*Tables section*/}
       <div className="h-full w-[70%] flex flex-col overflow-y-auto" style={{ backgroundColor: colorPalette.Charcoal }}>
         <div className="flex justify-between p-6 items-center">
           <h2 className="text-gray-400 m-0">Estado de las mesas: </h2>
@@ -15,15 +13,10 @@ const TablesContent = ({tables}: TableContentPrompts) => {
           </div>
         <div className="grid w-full p-6 grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-6">
           {tables.map((table) => (
-          <TableCards key={table.id} tableData={table}/>
+          <TableCards key={table.id} table={table} onSelect={onSelect}/>
           ))}
         </div>
       </div>
-
-      {/*Info section*/}
-      <div className="h-full w-[30%]" style={{ backgroundColor: colorPalette.White }}>
-      </div>
-    </div>
   )
 }
 

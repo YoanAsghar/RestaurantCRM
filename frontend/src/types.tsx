@@ -5,16 +5,6 @@ export enum BodyTabs {
   domicilios = "domicilios"
 }
 
-export interface tableCardProps {
-  data: {
-    id: number;
-    pedidoActual: object;
-    cantidadDePersonas: number;
-    precioACobrar: number;
-  }
-}
-
-
 export const colorPalette = {
   Black: "#02010a",
   PrusianBlue: "#04052e",
@@ -26,6 +16,7 @@ export const colorPalette = {
 
 export interface TableContentPrompts{
   tables: Table[];
+  onSelect: (id: number) => void;
 }
 
 export interface Table {
@@ -33,4 +24,13 @@ export interface Table {
   ordenActual: any[]; // Array of products
   cantidadDePersonas: number;
   precioACobrar: number;
+}
+
+export interface TableInformationProps{
+  table: Table | undefined;
+}
+
+export interface TableCardProps {
+  table: Table;
+  onSelect: (id: number) => void;
 }

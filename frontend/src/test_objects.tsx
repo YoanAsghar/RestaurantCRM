@@ -1,6 +1,6 @@
 import { type Table } from "./types";
 
-export const testTables: Table[] = [
+export const tables: Table[] = [
   {
     id: 1,
     ordenActual: ["Hamburguesa", "Coca-Cola"],
