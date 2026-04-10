@@ -1,14 +1,27 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { colorPalette, type Product, type TableInformationProps } from "../../types";
+import { ProductsTest } from "../../test_objects";
 
 const TableInformation = ({ table }: TableInformationProps) => {
   const [activePaymentButton, setActivePaymentButton] = useState(0);
   const [amountOfPersons, setAmountOfPersons] = useState(1);
   const [propina, setPropina] = useState(0);
+  const [currentTab, setCurrenTab] = useState(true);
+  const [searchBarValue, setSearchBarValue] = useState("");
 
   const total = (table?.ordenActual.reduce((sum, item) => sum + item.price, 0) || 0) + propina;
 
+  const filteredProducts = useMemo(() => {
+    if(!searchBarValue.trim()) return ProductsTest
+
+    return ProductsTest.filter(product => product.name.toLowerCase().includes(searchBarValue));
+  }, [searchBarValue])
+
+
+
+
   return (
+
     <div className="h-full w-full lg:w-[30%] flex flex-col overflow-hidden">
       {/* CABECERA */}
       <div 
@@ -46,8 +59,15 @@ const TableInformation = ({ table }: TableInformationProps) => {
       </div>
 
       
+      <div className="flex justify-center w-full" style={{backgroundColor: colorPalette.DeepTwilight}}>
+        <button className="cursor-pointer rounded-b-lg w-16 flex items-center justify-center" style={{backgroundColor: colorPalette.Navy}} onClick={() => setCurrenTab(!currentTab)}>
+          <img className="p-1" src="/swap_icon.png" alt="" />
+        </button>
+      </div>
 
       {/* PEDIDOS ACTUALES */}
+      {currentTab === true ? (
+
       <div 
         className="flex-1 flex flex-col min-h-0"
         style={{ backgroundColor: colorPalette.DeepTwilight }}
@@ -89,7 +109,6 @@ const TableInformation = ({ table }: TableInformationProps) => {
           </table>
         </div>
 
-        {/* Total */}
         <div className="p-5">
           <div className="flex justify-between items-center text-xl font-bold text-white">
             <span>Total:</span>
@@ -97,36 +116,46 @@ const TableInformation = ({ table }: TableInformationProps) => {
           </div>
         </div>
       </div>
+      ) : null}
 
-      <div className="shrink-0 border-b border-white/10">
+      {/*Agregar productos */}
+      {currentTab === false ? (
+      <div 
+        className="flex-1 flex flex-col min-h-0"
+        style={{ backgroundColor: colorPalette.DeepTwilight }}
+      >
         <h2 className="px-5 pt-5 pb-3 text-xl font-semibold text-white">
           Agregar productos
         </h2>
         <div className="relative w-full px-4">   {/* Contenedor relative */}
           <img 
-            src="./trash_icon.png" 
+            src="./search_icon.png" 
             alt="Buscar" 
             className="absolute left-7 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none"
           />
 
           <input 
+            onChange={(e) => setSearchBarValue(e.target.value.toLowerCase())}
             type="text" 
             placeholder="Buscar producto"
             className="w-full bg-indigo-950 text-white rounded-lg p-3 pl-14 border border-purple-950 focus:outline-none focus:border-purple-400"
           />
         </div>
-        <ul className="flex flex-col w-full">
-          {table?.ordenActual.map((product) => (
+        <ul className="flex flex-col w-full mt-4 overflow-y-scroll">
+          {filteredProducts.map((product) => (
             <li className="flex flex-row ml-4 mr-4 m-1 justify-between content-between rounded-lg text-white p-2 bg-purple-950">
               <div className="flex flex-row items-center">
                 <p className="text-1lg">{product.name}</p>
                 <p className="text-xs pl-5">${product.price}</p>
               </div>
-              <button className="mr-5-5 pr-4"> asdasdasd </button>
+              <button className="mr-5-5 pr-4 rounded-lg cursor-pointer"> 
+                <img className="h-full w-full bg-indigo-950 rounded-lg size-9" src="/plus.png" alt="" />
+              </button>
             </li>
           ))}
         </ul>
       </div>
+      ) : null}
 
       {/* MÉTODOS DE PAGO */}
       <div className="shrink-0 bg-black p-5 space-y-4">
