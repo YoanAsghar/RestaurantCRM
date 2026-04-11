@@ -28,7 +28,7 @@ export const ProductExample3 = {
 export const tables: Table[] = [
   {
     id: 1,
-    ordenActual: [ProductExample1, ProductExample1],
+    ordenActual: [],
     cantidadDePersonas: 2,
     precioACobrar: 25.50
   },
@@ -40,25 +40,25 @@ export const tables: Table[] = [
   },
   {
     id: 3,
-    ordenActual: [ProductExample3, ProductExample3],
+    ordenActual: [],
     cantidadDePersonas: 4,
     precioACobrar: 45.00
   },
   {
     id: 4,
-    ordenActual: [ProductExample3, ProductExample3, ProductExample1],
+    ordenActual: [],
     cantidadDePersonas: 1,
     precioACobrar: 15.75
   },
   {
     id: 5,
-    ordenActual: [ProductExample2,ProductExample1],
+    ordenActual: [],
     cantidadDePersonas: 2,
     precioACobrar: 38.20
   },
   {
     id: 6,
-    ordenActual: [ProductExample2],
+    ordenActual: [],
     cantidadDePersonas: 1,
     precioACobrar: 3
   }

@@ -1,15 +1,19 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { colorPalette, type Product, type TableInformationProps } from "../../types";
 import { ProductsTest } from "../../test_objects";
 
-const TableInformation = ({ table }: TableInformationProps) => {
+const TableInformation = ({ table, onUpdateTable }: TableInformationProps) => {
   const [activePaymentButton, setActivePaymentButton] = useState(0);
-  const [amountOfPersons, setAmountOfPersons] = useState(1);
+  const [amountOfPersons, setAmountOfPersons] = useState(table?.cantidadDePersonas || 0);
   const [propina, setPropina] = useState(0);
   const [currentTab, setCurrenTab] = useState(true);
   const [searchBarValue, setSearchBarValue] = useState("");
+  const [currenProducts, setCurrentProducts] = useState<Product[]>(table?.ordenActual || []);
+  const [totalPrice, setTotalPrice] = useState(0);
 
-  const total = (table?.ordenActual.reduce((sum, item) => sum + item.price, 0) || 0) + propina;
+    useEffect(() => {
+    setTotalPrice(currenProducts.reduce((sum, item) => sum + item.price, 0) || 0);
+}, [currenProducts, propina]);
 
   const filteredProducts = useMemo(() => {
     if(!searchBarValue.trim()) return ProductsTest
@@ -17,8 +21,32 @@ const TableInformation = ({ table }: TableInformationProps) => {
     return ProductsTest.filter(product => product.name.toLowerCase().includes(searchBarValue));
   }, [searchBarValue])
 
+  const addProductToOrders = (product: Product) => {
+    const updatedProducts = [...currenProducts, product];
+    setCurrentProducts(updatedProducts);
+
+    if(table){
+      onUpdateTable({
+        ...table,
+        ordenActual: updatedProducts
+      });
+    }
+  };
+
+  const removeProductFromOrders = (index: number) => {
+    const updatedProducts = currenProducts.filter((_, i) => i !== index);
+    setCurrentProducts(updatedProducts);
+
+    if(table){
+      onUpdateTable({
+        ...table,
+        ordenActual: updatedProducts
+      });
+    }
+  }
 
 
+  
 
   return (
 
@@ -41,7 +69,11 @@ const TableInformation = ({ table }: TableInformationProps) => {
             <input
               type="text"
               value={amountOfPersons}
-              onChange={(e) => setAmountOfPersons(Number(e.target.value) || 0)}
+              onChange={(e) => {
+                const val = Number(e.target.value) || 0;
+                setAmountOfPersons(val);
+                if(table) onUpdateTable({...table, cantidadDePersonas: val});
+              }}
               className="bg-black text-white text-center w-16 h-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
@@ -83,13 +115,14 @@ const TableInformation = ({ table }: TableInformationProps) => {
               </tr>
             </thead>
             <tbody>
-              {table?.ordenActual.map((product: Product) => (
-                <tr key={product.id} className="border-b border-white/10">
+              {currenProducts.map((product: Product, index: number) => (
+                <tr key={`${product.id}-${index}`} className="border-b border-white/10">
                   <td className="py-3 px-2">{product.name}</td>
                   <td className="py-3 px-2 text-center">${product.price}</td>
                   <td className="py-3 px-2 text-center">✗</td>
                   <td className="py-3 px-2">
                     <img
+                      onClick={() => removeProductFromOrders(index)}
                       className="cursor-pointer mx-auto hover:scale-110 transition-transform"
                       src="/trash_icon.png"
                       alt="Eliminar"
@@ -112,7 +145,7 @@ const TableInformation = ({ table }: TableInformationProps) => {
         <div className="p-5">
           <div className="flex justify-between items-center text-xl font-bold text-white">
             <span>Total:</span>
-            <span>${total.toFixed(0)}</span>
+            <span>${totalPrice.toFixed(0)}</span>
           </div>
         </div>
       </div>
@@ -148,7 +181,7 @@ const TableInformation = ({ table }: TableInformationProps) => {
                 <p className="text-1lg">{product.name}</p>
                 <p className="text-xs pl-5">${product.price}</p>
               </div>
-              <button className="mr-5-5 pr-4 rounded-lg cursor-pointer"> 
+              <button onClick={() => addProductToOrders(product)} className="mr-5-5 pr-4 rounded-lg cursor-pointer"> 
                 <img className="h-full w-full bg-indigo-950 rounded-lg size-9" src="/plus.png" alt="" />
               </button>
             </li>

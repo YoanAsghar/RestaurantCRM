@@ -28,6 +28,7 @@ export interface Table {
 
 export interface TableInformationProps{
   table: Table | undefined;
+  onUpdateTable: (updatedTable: Table) => void;
 }
 
 export interface TableCardProps {
