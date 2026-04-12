@@ -5,9 +5,10 @@ import Sidebar from "./components/Sidebar";
 import { BodyTabs, type Table } from "./types";
 import DomicilesContent from "./components/mainTabs/DomicilesContent";
 import InventoryContent from "./components/mainTabs/InventoryContent";
-import OrdersContent from "./components/mainTabs/OrdersContent";
+import { OrdersContent } from "./components/mainTabs/OrdersContent";
 import TablesContent from "./components/mainTabs/TablesContent";
 import TableInformation from "./components/mainTabs/tableInformation";
+import LoadingOverlay from "./components/LoadingOverlay";
 
 //Test imports
 
@@ -15,6 +16,8 @@ const App = () => {
 const [currentTab, setCurrentTab] = useState(BodyTabs.mesas);
 const [tables, setTables] = useState<Table[]>(initialTables);
 const [currentTableSelectedId, setCurrentTableSelectedId] = useState<number>(tables[0].id);
+  const [isLoading, setIsLoading] = useState(false);
+  
 
  const selectedTable = tables.find(t => t.id == currentTableSelectedId)
 
@@ -36,6 +39,7 @@ const [currentTableSelectedId, setCurrentTableSelectedId] = useState<number>(tab
                 key={currentTableSelectedId} 
                 table={selectedTable} 
                 onUpdateTable={handleUpdateTable}
+                setIsLoading = {setIsLoading}
               />
             </div>
           )}
@@ -43,6 +47,7 @@ const [currentTableSelectedId, setCurrentTableSelectedId] = useState<number>(tab
           {currentTab === BodyTabs.ordenes && <OrdersContent/>}
           {currentTab === BodyTabs.inventario && <InventoryContent/>}
           {currentTab === BodyTabs.domicilios && <DomicilesContent/>}
+          {isLoading === true && <LoadingOverlay isVisible={true} message="Procesando pago"/> }
         </main>
       </section>
     </div>

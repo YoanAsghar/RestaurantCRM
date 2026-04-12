@@ -29,6 +29,7 @@ export interface Table {
 export interface TableInformationProps{
   table: Table | undefined;
   onUpdateTable: (updatedTable: Table) => void;
+  setIsLoading: (isLoading: boolean) => void;
 }
 
 export interface TableCardProps {
