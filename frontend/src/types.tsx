@@ -1,3 +1,5 @@
+import { Table } from "./models/table";
+
 export enum BodyTabs {
   mesas = "mesas",
   ordenes = "ordenes",
@@ -19,12 +21,6 @@ export interface TableContentPrompts{
   onSelect: (id: number) => void;
 }
 
-export interface Table {
-  id: number;
-  ordenActual: Product[]; // Array of products
-  cantidadDePersonas: number;
-  precioACobrar: number;
-}
 
 export interface TableInformationProps{
   table: Table | undefined;
@@ -37,9 +33,4 @@ export interface TableCardProps {
   onSelect: (id: number) => void;
 }
 
-export interface Product{
-  id: number;
-  name: string;
-  price: number;
-}
 

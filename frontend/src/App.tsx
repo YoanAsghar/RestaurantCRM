@@ -2,7 +2,8 @@ import { tables as initialTables } from "./test_objects";
 //TESTS
 import { useState } from "react";
 import Sidebar from "./components/Sidebar";
-import { BodyTabs, type Table } from "./types";
+import { Table } from "./models/table";
+import { BodyTabs } from "./types";
 import DomicilesContent from "./components/mainTabs/DomicilesContent";
 import InventoryContent from "./components/mainTabs/InventoryContent";
 import { OrdersContent } from "./components/mainTabs/OrdersContent";
