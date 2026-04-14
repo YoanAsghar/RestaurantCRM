@@ -13,7 +13,9 @@ Id
 PedidoActual: {
  ...Productos
  },
-
+CantidadDePersonas,
+PrecioACobrar,
+Ocupada = bool,
 }
 
 Ordenes: {
