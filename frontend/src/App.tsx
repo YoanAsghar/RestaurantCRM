@@ -4,7 +4,6 @@ import { useState } from "react";
 import Sidebar from "./components/Sidebar";
 import { Table } from "./models/table";
 import { BodyTabs } from "./types";
-import DomicilesContent from "./components/mainTabs/DomicilesContent";
 import InventoryContent from "./components/mainTabs/InventoryContent";
 import { OrdersContent } from "./components/mainTabs/OrdersContent";
 import TablesContent from "./components/mainTabs/TablesContent";
@@ -63,7 +62,6 @@ const [currentTableSelectedId, setCurrentTableSelectedId] = useState<number>(tab
 
           {currentTab === BodyTabs.ordenes && <OrdersContent/>}
           {currentTab === BodyTabs.inventario && <InventoryContent/>}
-          {currentTab === BodyTabs.domicilios && <DomicilesContent/>}
           {isLoading === true && <LoadingOverlay isVisible={true} message="Procesando pago"/> }
         </main>
       </section>

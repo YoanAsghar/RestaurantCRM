@@ -1,6 +1,5 @@
-import { Clock, DollarSign, Users, CreditCard, Banknote } from "lucide-react";
+import { Users, Clock } from "lucide-react";
 import { Order } from "../../models/order";
-import { Product } from "../../models/product";
 
 const colorPalette = {
   DeepTwilight: "#140152",

@@ -45,13 +45,6 @@ const Sidebar = ({username, setTabChange, currentTab} : SideBarProps) => {
               : <a href="#" className="flex items-center gap-2 px-4 text-gray-700 ">Inventario</a>
             }
           </li>
-          <li onClick={() => {setTabChange(BodyTabs.domicilios); setSelectedTab(4)}} className={`flex flex-row items-center hover:bg-gray-100 px-3 py-3 rounded-lg cursor-pointer ${selectedTab === 4 ? "bg-purple-950 text-white" : ""}`}>
-            <img className="size-6" src="./domiciles.png" alt="" />
-            {!isCollapsed 
-              ? ""
-              : <a href="#" className="flex items-center gap-2 px-4 text-gray-700 ">Domicilios</a>
-            }
-          </li>
         </ul>
       </nav>
 
