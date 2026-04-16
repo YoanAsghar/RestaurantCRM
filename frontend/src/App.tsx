@@ -1,4 +1,4 @@
-import { tables as initialTables } from "./test_objects";
+
 //TESTS
 import { useState } from "react";
 import Sidebar from "./components/Sidebar";
@@ -16,7 +16,7 @@ import LoadingOverlay from "./components/LoadingOverlay";
 
 const App = () => {
 const [currentTab, setCurrentTab] = useState(BodyTabs.mesas);
-const [tables, setTables] = useState<Table[]>(initialTables);
+const [tables, setTables] = useState<Table[]>([...Table.TableInstances]);
 const [currentTableSelectedId, setCurrentTableSelectedId] = useState<number>(tables[0].id);
   const [isLoading, setIsLoading] = useState(false);
   
@@ -24,7 +24,22 @@ const [currentTableSelectedId, setCurrentTableSelectedId] = useState<number>(tab
  const selectedTable = tables.find(t => t.id == currentTableSelectedId)
 
  const handleUpdateTable = (updatedTable: Table) => {
-    setTables(prev => prev.map(t => t.id === updatedTable.id ? updatedTable : t));
+   setTables(prev => prev.map(t => t.id === updatedTable.id ? updatedTable : t));
+ };
+
+ const handleAddTable = () => {
+   const newId = tables.length > 0 ? Math.max(...tables.map(t => t.id)) + 1 : 1;
+   const newTable = new Table(newId);
+   setTables(prev => [...prev, newTable]);
+ };
+
+ const handleRemoveTable = () => {
+   if (tables.length === 0) return;
+   const newTables = tables.slice(0, -1);
+   setTables(newTables);
+   if (currentTableSelectedId !== newTables[newTables.length - 1]?.id) {
+     setCurrentTableSelectedId(newTables[newTables.length - 1]?.id);
+   }
  };
 
   return (
@@ -36,7 +51,7 @@ const [currentTableSelectedId, setCurrentTableSelectedId] = useState<number>(tab
 
           {currentTab === BodyTabs.mesas && (
             <div className="h-full flex flex-row w-full">
-              <TablesContent tables={tables} onSelect={setCurrentTableSelectedId} />
+              <TablesContent tables={tables} onSelect={setCurrentTableSelectedId} onAddTable={handleAddTable} onRemoveTable={handleRemoveTable} />
               <TableInformation 
                 key={currentTableSelectedId} 
                 table={selectedTable} 

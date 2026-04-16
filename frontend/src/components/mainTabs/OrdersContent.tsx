@@ -1,4 +1,6 @@
 import { Clock, DollarSign, Users, CreditCard, Banknote } from "lucide-react";
+import { Order } from "../../models/order";
+import { Product } from "../../models/product";
 
 const colorPalette = {
   DeepTwilight: "#140152",
@@ -7,169 +9,7 @@ const colorPalette = {
   White: "#f4f4f8"
 };
 
-interface OrderItem {
-  name: string;
-  quantity: number;
-  price: number;
-}
-
-interface Order {
-  id: string;
-  tableId: string;
-  items: OrderItem[];
-  status: "pending" | "preparing" | "ready" | "completed";
-  total: number;
-  date: string;
-  time: string;
-  paymentMethod?: "cash" | "card" | "transfer";
-  guests: number;
-}
-
 export const OrdersContent = () => {
-  const orders: Order[] = [
-    {
-      id: "ORD-001",
-      tableId: "Mesa 01",
-      items: [
-        { name: "Hamburguesa Premium", quantity: 2, price: 15.00 },
-        { name: "Papas Fritas", quantity: 2, price: 5.00 },
-        { name: "Coca Cola", quantity: 2, price: 3.50 },
-      ],
-      status: "completed",
-      total: 47.00,
-      date: "11/04/2026",
-      time: "12:30",
-      paymentMethod: "card",
-      guests: 2
-    },
-    {
-      id: "ORD-002",
-      tableId: "Mesa 03",
-      items: [
-        { name: "Pizza Margarita", quantity: 1, price: 14.00 },
-        { name: "Pasta Carbonara", quantity: 2, price: 13.50 },
-        { name: "Ensalada César", quantity: 1, price: 8.00 },
-        { name: "Jugo Natural", quantity: 3, price: 4.00 },
-      ],
-      status: "ready",
-      total: 57.00,
-      date: "11/04/2026",
-      time: "13:15",
-      guests: 3
-    },
-    {
-      id: "ORD-003",
-      tableId: "Mesa 05",
-      items: [
-        { name: "Hamburguesa Clásica", quantity: 4, price: 12.50 },
-        { name: "Papas Fritas", quantity: 3, price: 5.00 },
-        { name: "Coca Cola", quantity: 4, price: 3.50 },
-      ],
-      status: "preparing",
-      total: 79.00,
-      date: "11/04/2026",
-      time: "13:45",
-      guests: 4
-    },
-    {
-      id: "ORD-004",
-      tableId: "Mesa 02",
-      items: [
-        { name: "Ensalada César", quantity: 2, price: 8.00 },
-        { name: "Agua Mineral", quantity: 2, price: 2.50 },
-      ],
-      status: "pending",
-      total: 21.00,
-      date: "11/04/2026",
-      time: "14:00",
-      guests: 2
-    },
-    {
-      id: "ORD-005",
-      tableId: "Mesa 07",
-      items: [
-        { name: "Pizza Margarita", quantity: 2, price: 14.00 },
-        { name: "Hamburguesa Premium", quantity: 1, price: 15.00 },
-        { name: "Papas Fritas", quantity: 3, price: 5.00 },
-        { name: "Coca Cola", quantity: 5, price: 3.50 },
-      ],
-      status: "ready",
-      total: 75.50,
-      date: "11/04/2026",
-      time: "14:20",
-      guests: 5
-    },
-    {
-      id: "ORD-006",
-      tableId: "Mesa 01",
-      items: [
-        { name: "Pasta Carbonara", quantity: 1, price: 13.50 },
-        { name: "Ensalada César", quantity: 1, price: 8.00 },
-        { name: "Jugo Natural", quantity: 2, price: 4.00 },
-      ],
-      status: "completed",
-      total: 29.50,
-      date: "11/04/2026",
-      time: "11:00",
-      paymentMethod: "cash",
-      guests: 2
-    },
-    {
-      id: "ORD-007",
-      tableId: "Mesa 09",
-      items: [
-        { name: "Hamburguesa Clásica", quantity: 3, price: 12.50 },
-        { name: "Coca Cola", quantity: 3, price: 3.50 },
-      ],
-      status: "preparing",
-      total: 48.00,
-      date: "11/04/2026",
-      time: "14:35",
-      guests: 3
-    },
-    {
-      id: "ORD-008",
-      tableId: "Mesa 03",
-      items: [
-        { name: "Pizza Margarita", quantity: 3, price: 14.00 },
-        { name: "Papas Fritas", quantity: 4, price: 5.00 },
-        { name: "Agua Mineral", quantity: 6, price: 2.50 },
-      ],
-      status: "completed",
-      total: 77.00,
-      date: "11/04/2026",
-      time: "10:30",
-      paymentMethod: "transfer",
-      guests: 6
-    },
-  ];
-
-  const getPaymentIcon = (method?: Order["paymentMethod"]) => {
-    if (!method) return null;
-
-    switch (method) {
-      case "cash":
-        return <DollarSign className="w-4 h-4" />;
-      case "card":
-        return <CreditCard className="w-4 h-4" />;
-      case "transfer":
-        return <Banknote className="w-4 h-4" />;
-    }
-  };
-
-  const getPaymentLabel = (method?: Order["paymentMethod"]) => {
-    if (!method) return "-";
-
-    switch (method) {
-      case "cash":
-        return "Efectivo";
-      case "card":
-        return "Tarjeta";
-      case "transfer":
-        return "Transferencia";
-    }
-  };
-
   return (
     <div
       className="h-screen w-full overflow-auto"
@@ -236,14 +76,13 @@ export const OrdersContent = () => {
                 </tr>
               </thead>
               <tbody>
-                {orders.map((order, index) => {
+                {Order.OrderInstances.map((order) => {
                   return (
                     <tr
                       key={order.id}
                       className="border-b hover:bg-opacity-50 transition-colors"
                       style={{
                         borderColor: `${colorPalette.Navy}60`,
-                        backgroundColor: index % 2 === 0 ? "transparent" : `${colorPalette.Navy}20`
                       }}
                     >
                       {/* ID */}
@@ -281,15 +120,15 @@ export const OrdersContent = () => {
                       {/* Items */}
                       <td className="py-5 px-6">
                         <div className="space-y-1 max-w-xs">
-                          {order.items.map((item, idx) => (
+                          {Order.OrderInstances.map((item, idx) => (
                             <div
                               key={idx}
                               className="text-xs"
                               style={{ color: colorPalette.White, opacity: 0.85 }}
                             >
-                              {item.quantity}x {item.name}
+                              {item.items.length}x {item.id}
                               <span className="ml-2 opacity-60">
-                                (${(item.quantity * item.price).toFixed(2)})
+                                (${(item.items.length * item.total).toFixed(2)})
                               </span>
                             </div>
                           ))}
@@ -308,13 +147,13 @@ export const OrdersContent = () => {
                               className="text-xs"
                               style={{ color: colorPalette.White }}
                             >
-                              {order.date}
+                              {order.date.getDate()}
                             </div>
                             <div
                               className="text-xs opacity-60"
                               style={{ color: colorPalette.White }}
                             >
-                              {order.time}
+                              {order.date.getTime()}
                             </div>
                           </div>
                         </div>
@@ -322,32 +161,7 @@ export const OrdersContent = () => {
 
                       {/* Método de Pago */}
                       <td className="py-5 px-6">
-                        <div className="flex items-center gap-2">
-                          {order.paymentMethod ? (
-                            <>
-                              <div
-                                style={{ color: colorPalette.White, opacity: 0.7 }}
-                              >
-                                {getPaymentIcon(order.paymentMethod)}
-                              </div>
-                              <span
-                                className="text-sm"
-                                style={{ color: colorPalette.White }}
-                              >
-                                {getPaymentLabel(order.paymentMethod)}
-                              </span>
-                            </>
-                          ) : (
-                            <span
-                              className="text-sm opacity-50"
-                              style={{ color: colorPalette.White }}
-                            >
-                              Pendiente
-                            </span>
-                          )}
-                        </div>
                       </td>
-
                       {/* Total */}
                       <td
                         className="py-5 px-6 text-right font-bold text-base"
@@ -378,7 +192,7 @@ export const OrdersContent = () => {
                     className="py-4 px-6 text-right font-bold text-xl"
                     style={{ color: colorPalette.White }}
                   >
-                    ${orders.reduce((sum, order) => sum + order.total, 0).toFixed(2)}
+                    ${Order.OrderInstances.reduce((sum, order) => sum + order.total, 0).toFixed(2)}
                   </td>
                 </tr>
               </tfoot>
@@ -402,61 +216,7 @@ export const OrdersContent = () => {
               className="text-3xl font-bold"
               style={{ color: colorPalette.White }}
             >
-              {orders.length}
-            </p>
-          </div>
-
-          <div
-            className="p-6 rounded-xl"
-            style={{ backgroundColor: colorPalette.Charcoal }}
-          >
-            <p
-              className="text-xs opacity-70 mb-2"
-              style={{ color: colorPalette.White }}
-            >
-              Completadas
-            </p>
-            <p
-              className="text-3xl font-bold"
-              style={{ color: "#22c55e" }}
-            >
-              {orders.filter(o => o.status === "completed").length}
-            </p>
-          </div>
-
-          <div
-            className="p-6 rounded-xl"
-            style={{ backgroundColor: colorPalette.Charcoal }}
-          >
-            <p
-              className="text-xs opacity-70 mb-2"
-              style={{ color: colorPalette.White }}
-            >
-              En Proceso
-            </p>
-            <p
-              className="text-3xl font-bold"
-              style={{ color: "#f59e0b" }}
-            >
-              {orders.filter(o => o.status === "preparing" || o.status === "ready").length}
-            </p>
-          </div>
-
-          <div
-            className="p-6 rounded-xl"
-            style={{ backgroundColor: colorPalette.Charcoal }}
-          >
-            <p
-              className="text-xs opacity-70 mb-2"
-              style={{ color: colorPalette.White }}
-            >
-              Pendientes
-            </p>
-            <p
-              className="text-3xl font-bold"
-              style={{ color: "#ef4444" }}
-            >
-              {orders.filter(o => o.status === "pending").length}
+              {Order.OrderInstances.length}
             </p>
           </div>
         </div>

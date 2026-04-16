@@ -9,14 +9,14 @@ const TableCards = ({table, onSelect}: TableCardProps) => {
         <img className="p-2 m-3 rounded-lg" style={{ backgroundColor: colorPalette.DeepTwilight }} src="/person_icon.png" alt="" />
         <div className="flex flex-col">
           <p className="text-gray-500 text-xs">Personas</p>
-          <p className="text-white">{`${table.cantidadDePersonas} Comensales`}</p>
+          <p className="text-white">{`${table.order.guests} Comensales`}</p>
         </div>
       </div>
       <div className="flex flex-row items-center">
         <img className="p-2 m-3 rounded-lg" style={{ backgroundColor: colorPalette.DeepTwilight }} src="currency_icon.png" alt="" />
         <div className="flex flex-col">
           <p className="text-gray-500 text-xs">Cuenta total</p>
-          <p className="text-white">{`$${table.ordenActual.reduce((sum, item) => sum + item.price, 0)}`}</p>
+          <p className="text-white">{`$${table.order.items.reduce((sum, item) => sum + item.price, 0)}`}</p>
         </div>
       </div>
     </div>

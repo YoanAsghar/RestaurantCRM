@@ -1,27 +1,22 @@
-import { Product } from "./product";
+import { Order } from "./order";
 
 export class Table {
-  private static TableInstances: Table[] = [];
+  public static TableInstances: Table[] = [
+  {
+    id: 1,
+    order: new Order(1)
+  }
+  ];
 
   id: number;
-  ordenActual: Product[]; // Array of products
-  cantidadDePersonas: number;
-  precioACobrar: number;
+  order: Order;
 
-  constructor(
-    id: number,
-    ordenActual: Product[],
-    cantidadDePersonas: number,
-    precioACobrar: number,
-  ) {
+  constructor(id: number) {
     this.id = id;
-    this.ordenActual = ordenActual;
-    this.cantidadDePersonas = cantidadDePersonas;
-    this.precioACobrar = precioACobrar;
+    this.order = new Order(this.id);
+
+    Table.TableInstances.push(this);
   }
 
-  public static getAllTableInstances(){
-    return this.TableInstances;
-  }
 }
 

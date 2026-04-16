@@ -1,15 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
-import { colorPalette, type Product, type TableInformationProps } from "../../types";
+import { colorPalette, type TableInformationProps } from "../../types";
 import { ProductsTest } from "../../test_objects";
+import { Product } from "../../models/product";
+import type { Order } from "../../models/order";
 
 const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformationProps) => {
   const [activePaymentButton, setActivePaymentButton] = useState(0);
-  const [amountOfPersons, setAmountOfPersons] = useState(table?.cantidadDePersonas || 0);
+  const [amountOfPersons, setAmountOfPersons] = useState(table?.order.guests || 0);
   const [propina, setPropina] = useState(0);
   const [currentTab, setCurrenTab] = useState(true);
   const [searchBarValue, setSearchBarValue] = useState("");
-  const [currenProducts, setCurrentProducts] = useState<Product[]>(table?.ordenActual || []);
+  const [currenProducts, setCurrentProducts] = useState<Product[]>(table?.order.items || []);
   const [totalPrice, setTotalPrice] = useState(0);
+
+  useEffect(() => {
+    setAmountOfPersons(table?.order.guests || 0);
+    setCurrentProducts(table?.order.items || []);
+  }, [table?.id]);
 
   useEffect(() => {
     setTotalPrice(currenProducts.reduce((sum, item) => sum + item.price, 0) || 0);
@@ -21,36 +28,31 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
     return ProductsTest.filter(product => product.name.toLowerCase().includes(searchBarValue));
   }, [searchBarValue])
 
-  const addProductToOrders = (product: Product) => {
-    const updatedProducts = [...currenProducts, product];
-
-    setCurrentProducts(updatedProducts);
-
-    if(table){
-      onUpdateTable({
-        ...table,
-        ordenActual: updatedProducts
-      });
-    }
-  };
-
-  const removeProductFromOrders = (index: number) => {
-    const updatedProducts = currenProducts.filter((_, i) => i !== index);
-    setCurrentProducts(updatedProducts);
-
-    if(table){
-      onUpdateTable({
-        ...table,
-        ordenActual: updatedProducts
-      });
+  function handlePersonsChange(value: number) {
+    setAmountOfPersons(value);
+    if (table) {
+      table.order.guests = value;
+      onUpdateTable(table);
     }
   }
-  // Hash maps for couting the amount of products
 
+  function addProductToTable(item: Product){
+    if (table) {
+      table.order.items = [...table.order.items, item];
+      setCurrentProducts([...table.order.items]);
+      onUpdateTable(table);
+    }
+  }
 
+  function removeProductFromTable(index: number){
+    if (table) {
+      table.order.items = table.order.items.filter((_, i) => i !== index);
+      setCurrentProducts([...table.order.items]);
+      onUpdateTable(table);
+    }
+  }
 
   return (
-
     <div className="h-full w-full lg:w-[30%] flex flex-col overflow-hidden">
       {/* CABECERA */}
       <div 
@@ -59,9 +61,6 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
       >
         <div className="flex items-center gap-3">
           <h2 className="text-2xl font-bold text-white">{`Mesa ${table?.id}`}</h2>
-          <button className="bg-red-600 hover:bg-red-700 p-2.5 rounded-xl transition-colors">
-            <img className="size-5" src="/trash_icon.png" alt="Eliminar" />
-          </button>
         </div>
 
         <div className="flex flex-wrap gap-4">
@@ -70,11 +69,7 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
             <input
               type="text"
               value={amountOfPersons}
-              onChange={(e) => {
-                const val = Number(e.target.value) || 0;
-                setAmountOfPersons(val);
-                if(table) onUpdateTable({...table, cantidadDePersonas: val});
-              }}
+              onChange={(e) => handlePersonsChange(Number(e.target.value) || 0)}
               className="bg-black text-white text-center w-16 h-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
@@ -117,16 +112,16 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
               </thead>
               <tbody>
                 {currenProducts.map((product: Product, index: number) => (
-                  <tr key={`${product.id}-${index}`} className="border-b border-white/10">
+                  <tr key={index} className="border-b border-white/10">
                     <td className="py-3 px-2">{product.name}</td>
                     <td className="py-3 px-2 text-center">${product.price}</td>
                     <td className="py-3 px-2 text-center">✗</td>
                     <td className="py-3 px-2">
                       <img
-                        onClick={() => removeProductFromOrders(index)}
                         className="cursor-pointer mx-auto hover:scale-110 transition-transform"
                         src="/trash_icon.png"
                         alt="Eliminar"
+                        onClick={() => removeProductFromTable(index)}
                       />
                     </td>
                   </tr>
@@ -182,7 +177,7 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
                   <p className="text-1lg">{product.name}</p>
                   <p className="text-xs pl-5">${product.price}</p>
                 </div>
-                <button onClick={() => addProductToOrders(product)} className="mr-5-5 pr-4 rounded-lg cursor-pointer"> 
+                <button onClick={() => addProductToTable(product)} className="mr-5-5 pr-4 rounded-lg cursor-pointer"> 
                   <img className="h-full w-full bg-indigo-950 rounded-lg size-9" src="/plus.png" alt="" />
                 </button>
               </li>
@@ -216,7 +211,7 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
           />
         </div>
 
-        <button onClick={() => setIsLoading(true)} className="w-full bg-purple-600 hover:bg-purple-700 h-14 rounded-2xl text-white font-bold text-xl transition-colors">
+        <button onClick={() => /*setIsLoading(true)*/ console.log(table)} className="w-full bg-purple-600 hover:bg-purple-700 h-14 rounded-2xl text-white font-bold text-xl transition-colors">
           Procesar pago
         </button>
       </div>

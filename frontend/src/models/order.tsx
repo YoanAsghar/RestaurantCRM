@@ -1,7 +1,13 @@
 import { Product } from "./product";
 
+enum paymentMethod{
+  CASH = "efectivo",
+  CARD = "tarjeta",
+  BANK_TRANS = "transferencia"
+}
+
 export class Order{
-  private static OrderInstances: Order[] = [];
+  public static OrderInstances: Order[] = [];
 
   id: number;
   tableId: number;
@@ -9,14 +15,18 @@ export class Order{
   total: number;
   date: Date;
   guests: number;
+  paymentMethod: paymentMethod;
 
-  constructor(id: number, tableId: number, items: Product[], total: number, date: Date, guests: number){
-    this.id = id;
+  constructor(tableId: number){
+    this.id = Order.OrderInstances.length === 0
+    ? 1
+    : Math.max(...Order.OrderInstances.map(o => o.id)) + 1;
     this.tableId = tableId;
-    this.items = items;
-    this.total = total;
-    this.date = date;
-    this.guests = guests;
+    this.items = [];
+    this.total = 0;
+    this.date = new Date();
+    this.guests = 0;
+    this.paymentMethod = paymentMethod.CASH;
   }
 
   public static getAllOrderInstances(){

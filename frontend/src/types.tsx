@@ -19,6 +19,8 @@ export const colorPalette = {
 export interface TableContentPrompts{
   tables: Table[];
   onSelect: (id: number) => void;
+  onAddTable: () => void;
+  onRemoveTable: () => void;
 }
 
 
