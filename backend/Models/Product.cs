@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RestaurantCRM.Models
@@ -7,9 +6,7 @@ namespace RestaurantCRM.Models
     public class Product
     {
         public int Id { get; set; }
-        [Required]
+        public string Name { get; set; } = string.Empty;
         public double Price { get; set; }
-        public int Stock { get; set; }
-        public string ImageReference { get; set; } = string.Empty;
     }
 }
