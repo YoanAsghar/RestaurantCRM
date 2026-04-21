@@ -15,6 +15,7 @@ export class Order{
   total: number;
   date: Date;
   guests: number;
+  tip: number;
   paymentMethod: paymentMethod;
 
   constructor(tableId: number){
@@ -26,6 +27,7 @@ export class Order{
     this.total = 0;
     this.date = new Date();
     this.guests = 0;
+    this.tip = 0;
     this.paymentMethod = paymentMethod.CASH;
   }
 

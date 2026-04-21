@@ -2,54 +2,98 @@ import { useEffect, useMemo, useState } from "react";
 import { colorPalette, type TableInformationProps } from "../../types";
 import { ProductsTest } from "../../test_objects";
 import { Product } from "../../models/product";
-import type { Order } from "../../models/order";
+import { Order } from "../../models/order";
 
 const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformationProps) => {
   const [activePaymentButton, setActivePaymentButton] = useState(0);
-  const [amountOfPersons, setAmountOfPersons] = useState(table?.order.guests || 0);
-  const [propina, setPropina] = useState(0);
+  const [amountOfPersons, setAmountOfPersons] = useState(table?.order?.guests || 0);
+  const [propina, setPropina] = useState(table?.order?.tip || 0);
   const [currentTab, setCurrenTab] = useState(true);
   const [searchBarValue, setSearchBarValue] = useState("");
-  const [currenProducts, setCurrentProducts] = useState<Product[]>(table?.order.items || []);
+  const [currenProducts, setCurrentProducts] = useState<Product[]>(table?.order?.items || []);
   const [totalPrice, setTotalPrice] = useState(0);
 
   useEffect(() => {
-    setAmountOfPersons(table?.order.guests || 0);
-    setCurrentProducts(table?.order.items || []);
+    setAmountOfPersons(table?.order?.guests || 0);
+    setPropina(table?.order?.tip || 0);
+    setCurrentProducts(table?.order?.items || []);
   }, [table?.id]);
 
   useEffect(() => {
-    setTotalPrice(currenProducts.reduce((sum, item) => sum + item.price, 0) || 0);
+    const productsTotal = currenProducts.reduce((sum, item) => sum + item.price, 0);
+    setTotalPrice(productsTotal + propina);
   }, [currenProducts, propina]);
 
   const filteredProducts = useMemo(() => {
     if(!searchBarValue.trim()) return ProductsTest
-
     return ProductsTest.filter(product => product.name.toLowerCase().includes(searchBarValue));
   }, [searchBarValue])
 
+  // Función para sincronizar los datos locales con el componente padre (y las tarjetas)
+  const syncWithParent = (guests: number, items: Product[], tip: number) => {
+    if (!table) return;
+    const updatedOrder = new Order(table.id);
+    updatedOrder.guests = guests;
+    updatedOrder.items = items;
+    updatedOrder.tip = tip;
+    updatedOrder.total = items.reduce((sum, item) => sum + item.price, 0) + tip;
+
+    onUpdateTable({
+      ...table,
+      order: updatedOrder
+    });
+  };
+
   function handlePersonsChange(value: number) {
     setAmountOfPersons(value);
-    if (table) {
-      table.order.guests = value;
-      onUpdateTable(table);
-    }
+    syncWithParent(value, currenProducts, propina);
+  }
+
+  function handlePropinaChange(value: number) {
+    setPropina(value);
+    syncWithParent(amountOfPersons, currenProducts, value);
   }
 
   function addProductToTable(item: Product){
-    if (table) {
-      table.order.items = [...table.order.items, item];
-      setCurrentProducts([...table.order.items]);
-      onUpdateTable(table);
-    }
+    const newItems = [...currenProducts, item];
+    setCurrentProducts(newItems);
+    syncWithParent(amountOfPersons, newItems, propina);
   }
 
   function removeProductFromTable(index: number){
-    if (table) {
-      table.order.items = table.order.items.filter((_, i) => i !== index);
-      setCurrentProducts([...table.order.items]);
-      onUpdateTable(table);
+    const newItems = currenProducts.filter((_, i) => i !== index);
+    setCurrentProducts(newItems);
+    syncWithParent(amountOfPersons, newItems, propina);
+  }
+
+  function resetTableData(){
+    setAmountOfPersons(0);
+    setCurrentProducts([]);
+    setPropina(0);
+
+    if(table){
+      onUpdateTable({
+        ...table,
+        order: undefined
+      })
     }
+  }
+
+  function handleProcessPayment() {
+    if (!table) return;
+    
+    const finalOrder = new Order(table.id);
+    finalOrder.guests = amountOfPersons;
+    finalOrder.items = currenProducts;
+    finalOrder.tip = propina;
+    finalOrder.total = totalPrice;
+
+
+    onUpdateTable({
+      ...table,
+      order: finalOrder
+    });
+    resetTableData();
   }
 
   return (
@@ -79,13 +123,12 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
             <input
               type="text"
               value={propina}
-              onChange={(e) => setPropina(Number(e.target.value) || 0)}
+              onChange={(e) => handlePropinaChange(Number(e.target.value) || 0)}
               className="bg-black text-white text-center w-20 h-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
         </div>
       </div>
-
 
       <div className="flex justify-center w-full" style={{backgroundColor: colorPalette.DeepTwilight}}>
         <button className="cursor-pointer rounded-b-lg w-16 flex items-center justify-center" style={{backgroundColor: colorPalette.Navy}} onClick={() => setCurrenTab(!currentTab)}>
@@ -95,7 +138,6 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
 
       {/* PEDIDOS ACTUALES */}
       {currentTab === true ? (
-
         <div 
           className="flex-1 flex flex-col min-h-0"
           style={{ backgroundColor: colorPalette.DeepTwilight }}
@@ -126,7 +168,6 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
                     </td>
                   </tr>
                 ))}
-
                 {propina !== 0 && (
                   <tr>
                     <td colSpan={4} className="py-3 px-2 font-medium">
@@ -137,7 +178,6 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
               </tbody>
             </table>
           </div>
-
           <div className="p-5">
             <div className="flex justify-between items-center text-xl font-bold text-white">
               <span>Total:</span>
@@ -147,7 +187,7 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
         </div>
       ) : null}
 
-      {/*Agregar productos */}
+      {/* Agregar productos */}
       {currentTab === false ? (
         <div 
           className="flex-1 flex flex-col min-h-0"
@@ -156,13 +196,12 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
           <h2 className="px-5 pt-5 pb-3 text-xl font-semibold text-white">
             Agregar productos
           </h2>
-          <div className="relative w-full px-4">   {/* Contenedor relative */}
+          <div className="relative w-full px-4">
             <img 
               src="./search_icon.png" 
               alt="Buscar" 
               className="absolute left-7 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none"
             />
-
             <input 
               onChange={(e) => setSearchBarValue(e.target.value.toLowerCase())}
               type="text" 
@@ -172,7 +211,7 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
           </div>
           <ul className="flex flex-col w-full mt-4 overflow-y-scroll">
             {filteredProducts.map((product) => (
-              <li className="flex flex-row ml-4 mr-4 m-1 justify-between content-between rounded-lg text-white p-2 bg-purple-950">
+              <li key={product.name + Math.random()} className="flex flex-row ml-4 mr-4 m-1 justify-between content-between rounded-lg text-white p-2 bg-purple-950">
                 <div className="flex flex-row items-center">
                   <p className="text-1lg">{product.name}</p>
                   <p className="text-xs pl-5">${product.price}</p>
@@ -189,7 +228,6 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
       {/* MÉTODOS DE PAGO */}
       <div className="shrink-0 bg-black p-5 space-y-4">
         <h2 className="text-2xl font-semibold text-white">Métodos de pago</h2>
-
         <div className="grid grid-cols-3 gap-3">
           <PaymentButton
             active={activePaymentButton === 1}
@@ -210,8 +248,10 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
             label="Tarjeta"
           />
         </div>
-
-        <button onClick={() => /*setIsLoading(true)*/ console.log(table)} className="w-full bg-purple-600 hover:bg-purple-700 h-14 rounded-2xl text-white font-bold text-xl transition-colors">
+        <button 
+          onClick={handleProcessPayment} 
+          className="w-full bg-purple-600 hover:bg-purple-700 h-14 rounded-2xl text-white font-bold text-xl transition-colors"
+        >
           Procesar pago
         </button>
       </div>

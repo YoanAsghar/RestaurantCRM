@@ -1,6 +1,6 @@
 
 //TESTS
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "./components/Sidebar";
 import { Table } from "./models/table";
 import { BodyTabs } from "./types";
@@ -9,16 +9,20 @@ import { OrdersContent } from "./components/mainTabs/OrdersContent";
 import TablesContent from "./components/mainTabs/TablesContent";
 import TableInformation from "./components/mainTabs/tableInformation";
 import LoadingOverlay from "./components/LoadingOverlay";
+import { TableServices } from "./services/TableServices";
 
 //Test imports
-
 
 const App = () => {
 const [currentTab, setCurrentTab] = useState(BodyTabs.mesas);
 const [tables, setTables] = useState<Table[]>([...Table.TableInstances]);
-const [currentTableSelectedId, setCurrentTableSelectedId] = useState<number>(tables[0].id);
+const [currentTableSelectedId, setCurrentTableSelectedId] = useState<number>(1);
   const [isLoading, setIsLoading] = useState(false);
   
+  // Retrieve all the created tables when the app loads first
+  useEffect(() => {
+    TableServices.getAll().then(setTables);
+  }, [])
 
  const selectedTable = tables.find(t => t.id == currentTableSelectedId)
 
@@ -27,8 +31,7 @@ const [currentTableSelectedId, setCurrentTableSelectedId] = useState<number>(tab
  };
 
  const handleAddTable = () => {
-   const newId = tables.length > 0 ? Math.max(...tables.map(t => t.id)) + 1 : 1;
-   const newTable = new Table(newId);
+   const newTable = new Table();
    setTables(prev => [...prev, newTable]);
  };
 

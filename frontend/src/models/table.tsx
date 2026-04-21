@@ -1,22 +1,24 @@
 import { Order } from "./order";
 
 export class Table {
-  public static TableInstances: Table[] = [
-  {
-    id: 1,
-    order: new Order(1)
-  }
-  ];
+  public static TableInstances: Table[] = [];
 
   id: number;
-  order: Order;
+  order?: Order;
 
-  constructor(id: number) {
-    this.id = id;
-    this.order = new Order(this.id);
+  constructor(id?: number, order?: Order) {
+    if (id !== undefined) {
+      this.id = id;
+    } else {
+      this.id = Table.TableInstances.length === 0
+        ? 1
+        : Math.max(...Table.TableInstances.map(t => t.id)) + 1;
+    }
+    
+    this.order = order;
 
-    Table.TableInstances.push(this);
+    if (!Table.TableInstances.some(t => t.id === this.id)) {
+      Table.TableInstances.push(this);
+    }
   }
-
 }
-

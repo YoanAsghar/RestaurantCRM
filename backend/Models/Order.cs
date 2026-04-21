@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RestaurantCRM.Models
@@ -12,7 +11,12 @@ namespace RestaurantCRM.Models
         public int Guests { get; set; }
 
         //Foreign keys
-        public Table? TableId { get; set; }
+        public int? TableId { get; set; }
+        [ForeignKey("TableId")]
+        public Table? Table { get; set; }
+
+        public int? OrderDetailId { get; set; }
+        [ForeignKey("OrderDetailId")]
         public OrderDetail? OrderDetail { get; set; }
     }
 }

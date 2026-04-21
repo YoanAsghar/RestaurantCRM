@@ -3,7 +3,7 @@ using RestaurantCRM.Models;
 
 namespace RestaurantCRM.Controllers;
 
-[Route("/api/v1[controller]")]
+[Route("/api/v1/[controller]")]
 [ApiController]
 
 public class ProductController : ControllerBase

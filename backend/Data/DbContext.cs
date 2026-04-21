@@ -1,3 +1,5 @@
+using RestaurantCRM.Models;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace RestaurantCRM.Data
@@ -7,5 +9,9 @@ namespace RestaurantCRM.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
           : base(options) { }
 
+        public DbSet<Table> Tables { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<OrderDetail> OrdersDetails { get; set; }
     }
 }
