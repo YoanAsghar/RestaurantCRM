@@ -16,12 +16,6 @@ export const colorPalette = {
   White: "#f4f4f8"
 }
 
-export interface TableContentPrompts{
-  tables: Table[];
-  onSelect: (id: number) => void;
-  onAddTable: () => void;
-  onRemoveTable: () => void;
-}
 
 
 export interface TableInformationProps{

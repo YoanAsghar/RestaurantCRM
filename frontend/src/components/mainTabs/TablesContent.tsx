@@ -1,5 +1,13 @@
-import { colorPalette, type TableContentPrompts} from "../../types"
+import { colorPalette} from "../../types"
 import TableCards from "../TableCards"
+import { Table } from "../../models/table";
+
+interface TableContentPrompts{
+  tables: Table[];
+  onSelect: (id: number) => void;
+  onAddTable: () => void;
+  onRemoveTable: () => void;
+}
 
 const TablesContent = ({tables, onSelect, onAddTable, onRemoveTable}: TableContentPrompts) => {
   return (

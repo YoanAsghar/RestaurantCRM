@@ -41,6 +41,20 @@ public class TableController : ControllerBase
     [HttpDelete]
     public async Task<ActionResult> DeleteTable()
     {
+        var TableToDelete = _context.Tables
+          .OrderBy(t => t.Id)
+          .Last();
+        _context.Tables.Remove(TableToDelete);
+
+        try
+        {
+            await _context.SaveChangesAsync();
+            return Ok(TableToDelete);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error deleting table {ex}");
+        }
         return Ok();
     }
 }

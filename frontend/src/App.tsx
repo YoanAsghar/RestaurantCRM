@@ -1,5 +1,4 @@
 
-//TESTS
 import { useEffect, useState } from "react";
 import Sidebar from "./components/Sidebar";
 import { Table } from "./models/table";
@@ -11,14 +10,20 @@ import TableInformation from "./components/mainTabs/tableInformation";
 import LoadingOverlay from "./components/LoadingOverlay";
 import { TableServices } from "./services/TableServices";
 
-//Test imports
-
 const App = () => {
 const [currentTab, setCurrentTab] = useState(BodyTabs.mesas);
-const [tables, setTables] = useState<Table[]>([...Table.TableInstances]);
+
+  //Table states
+const [tables, setTables] = useState<Table[]>([]);
 const [currentTableSelectedId, setCurrentTableSelectedId] = useState<number>(1);
-  const [isLoading, setIsLoading] = useState(false);
+
+
+const [isLoading, setIsLoading] = useState(false);
   
+  //
+  // TABLES RELATED FUNCTIONS
+  //
+
   // Retrieve all the created tables when the app loads first
   useEffect(() => {
     TableServices.getAll().then(setTables);
@@ -30,19 +35,40 @@ const [currentTableSelectedId, setCurrentTableSelectedId] = useState<number>(1);
    setTables(prev => prev.map(t => t.id === updatedTable.id ? updatedTable : t));
  };
 
- const handleAddTable = () => {
-   const newTable = new Table();
-   setTables(prev => [...prev, newTable]);
+ const handleAddTable = async () => {
+    setIsLoading(true);
+    try {
+        await TableServices.createTable();
+        const updatedTables = await TableServices.getAll();
+        setTables(updatedTables);
+    } catch (error) {
+        console.error("Error adding table:", error);
+    } finally {
+        setIsLoading(false);
+    }
  };
 
- const handleRemoveTable = () => {
-   if (tables.length === 0) return;
-   const newTables = tables.slice(0, -1);
-   setTables(newTables);
-   if (currentTableSelectedId !== newTables[newTables.length - 1]?.id) {
-     setCurrentTableSelectedId(newTables[newTables.length - 1]?.id);
-   }
+ const handleRemoveTable = async () => {
+    setIsLoading(true);
+      try {
+        await TableServices.deleteTable();
+        const updatedTables = await TableServices.getAll();
+        setTables(updatedTables);
+    } catch (error) {
+        console.error("Error removing table:", error);
+    } finally {
+        setIsLoading(false);
+    }
  };
+
+  //
+  // ORDERS RELATED PRODUCTS
+  //
+
+  //get starting orders
+  useEffect(() => {
+    
+  }, [])
 
   return (
     <div className="flex flex-row h-screen w-screen overflow-hidden">

@@ -11,7 +11,7 @@ export class Order{
 
   id: number;
   tableId: number;
-  items: Product[];
+  orderDetail: Product[];
   total: number;
   date: Date;
   guests: number;
@@ -23,7 +23,7 @@ export class Order{
     ? 1
     : Math.max(...Order.OrderInstances.map(o => o.id)) + 1;
     this.tableId = tableId;
-    this.items = [];
+    this.orderDetail = [];
     this.total = 0;
     this.date = new Date();
     this.guests = 0;

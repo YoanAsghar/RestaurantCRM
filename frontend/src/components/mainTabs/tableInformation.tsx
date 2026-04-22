@@ -3,6 +3,7 @@ import { colorPalette, type TableInformationProps } from "../../types";
 import { ProductsTest } from "../../test_objects";
 import { Product } from "../../models/product";
 import { Order } from "../../models/order";
+import { OrderServices } from "../../services/OrderServices";
 
 const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformationProps) => {
   const [activePaymentButton, setActivePaymentButton] = useState(0);
@@ -10,13 +11,13 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
   const [propina, setPropina] = useState(table?.order?.tip || 0);
   const [currentTab, setCurrenTab] = useState(true);
   const [searchBarValue, setSearchBarValue] = useState("");
-  const [currenProducts, setCurrentProducts] = useState<Product[]>(table?.order?.items || []);
+  const [currenProducts, setCurrentProducts] = useState<Product[]>(table?.order?.orderDetail || []);
   const [totalPrice, setTotalPrice] = useState(0);
 
   useEffect(() => {
     setAmountOfPersons(table?.order?.guests || 0);
     setPropina(table?.order?.tip || 0);
-    setCurrentProducts(table?.order?.items || []);
+    setCurrentProducts(table?.order?.orderDetail || []);
   }, [table?.id]);
 
   useEffect(() => {
@@ -30,13 +31,13 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
   }, [searchBarValue])
 
   // Función para sincronizar los datos locales con el componente padre (y las tarjetas)
-  const syncWithParent = (guests: number, items: Product[], tip: number) => {
+  const syncWithParent = (guests: number, orderDetail: Product[], tip: number) => {
     if (!table) return;
     const updatedOrder = new Order(table.id);
     updatedOrder.guests = guests;
-    updatedOrder.items = items;
+    updatedOrder.orderDetail = orderDetail;
     updatedOrder.tip = tip;
-    updatedOrder.total = items.reduce((sum, item) => sum + item.price, 0) + tip;
+    updatedOrder.total = orderDetail.reduce((sum, item) => sum + item.price, 0) + tip;
 
     onUpdateTable({
       ...table,
@@ -84,10 +85,18 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
     
     const finalOrder = new Order(table.id);
     finalOrder.guests = amountOfPersons;
-    finalOrder.items = currenProducts;
+    finalOrder.orderDetail = currenProducts;
     finalOrder.tip = propina;
     finalOrder.total = totalPrice;
 
+    setIsLoading(true);
+    try{
+      OrderServices.createOrder(finalOrder);
+    }catch(err){
+      console.error(err)
+    }finally{
+      setIsLoading(false);
+    }
 
     onUpdateTable({
       ...table,
@@ -100,15 +109,15 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
     <div className="h-full w-full lg:w-[30%] flex flex-col overflow-hidden">
       {/* CABECERA */}
       <div 
-        className="shrink-0 p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between"
+        className="shrink-0 p-4 flex flex-col sm:flex-row gap-4 orderDetail-start sm:orderDetail-center justify-between"
         style={{ backgroundColor: colorPalette.Navy }}
       >
-        <div className="flex items-center gap-3">
+        <div className="flex orderDetail-center gap-3">
           <h2 className="text-2xl font-bold text-white">{`Mesa ${table?.id}`}</h2>
         </div>
 
         <div className="flex flex-wrap gap-4">
-          <div className="flex items-center gap-2">
+          <div className="flex orderDetail-center gap-2">
             <label className="text-white text-sm">Personas:</label>
             <input
               type="text"
@@ -118,7 +127,7 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
             />
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex orderDetail-center gap-2">
             <label className="text-white text-sm">Propina:</label>
             <input
               type="text"
@@ -131,7 +140,7 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
       </div>
 
       <div className="flex justify-center w-full" style={{backgroundColor: colorPalette.DeepTwilight}}>
-        <button className="cursor-pointer rounded-b-lg w-16 flex items-center justify-center" style={{backgroundColor: colorPalette.Navy}} onClick={() => setCurrenTab(!currentTab)}>
+        <button className="cursor-pointer rounded-b-lg w-16 flex orderDetail-center justify-center" style={{backgroundColor: colorPalette.Navy}} onClick={() => setCurrenTab(!currentTab)}>
           <img className="p-1" src="/swap_icon.png" alt="" />
         </button>
       </div>
@@ -179,7 +188,7 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
             </table>
           </div>
           <div className="p-5">
-            <div className="flex justify-between items-center text-xl font-bold text-white">
+            <div className="flex justify-between orderDetail-center text-xl font-bold text-white">
               <span>Total:</span>
               <span>${totalPrice.toFixed(0)}</span>
             </div>
@@ -212,7 +221,7 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
           <ul className="flex flex-col w-full mt-4 overflow-y-scroll">
             {filteredProducts.map((product) => (
               <li key={product.name + Math.random()} className="flex flex-row ml-4 mr-4 m-1 justify-between content-between rounded-lg text-white p-2 bg-purple-950">
-                <div className="flex flex-row items-center">
+                <div className="flex flex-row orderDetail-center">
                   <p className="text-1lg">{product.name}</p>
                   <p className="text-xs pl-5">${product.price}</p>
                 </div>
@@ -262,7 +271,7 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
 const PaymentButton = ({ active, onClick, icon, label }: any) => (
   <div
     onClick={onClick}
-    className={`flex flex-col items-center justify-center p-3 rounded-2xl cursor-pointer transition-all
+    className={`flex flex-col orderDetail-center justify-center p-3 rounded-2xl cursor-pointer transition-all
 ${active 
 ? "bg-purple-950 scale-105" 
 : "bg-zinc-900 hover:bg-zinc-800"}`}
