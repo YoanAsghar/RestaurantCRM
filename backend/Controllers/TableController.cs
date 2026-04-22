@@ -55,6 +55,5 @@ public class TableController : ControllerBase
         {
             return StatusCode(500, $"Error deleting table {ex}");
         }
-        return Ok();
     }
 }

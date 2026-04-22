@@ -9,6 +9,8 @@ import TablesContent from "./components/mainTabs/TablesContent";
 import TableInformation from "./components/mainTabs/tableInformation";
 import LoadingOverlay from "./components/LoadingOverlay";
 import { TableServices } from "./services/TableServices";
+import type { Product } from "./models/product";
+import { ProductServices } from "./services/ProductServices";
 
 const App = () => {
 const [currentTab, setCurrentTab] = useState(BodyTabs.mesas);
@@ -16,6 +18,9 @@ const [currentTab, setCurrentTab] = useState(BodyTabs.mesas);
   //Table states
 const [tables, setTables] = useState<Table[]>([]);
 const [currentTableSelectedId, setCurrentTableSelectedId] = useState<number>(1);
+
+  //Prodcut states
+  const [products, setProducts] = useState<Product[]>([]);
 
 
 const [isLoading, setIsLoading] = useState(false);
@@ -62,12 +67,13 @@ const [isLoading, setIsLoading] = useState(false);
  };
 
   //
-  // ORDERS RELATED PRODUCTS
+  // PRODUCTS RELATED FUNCTIONS
   //
-
-  //get starting orders
-  useEffect(() => {
+  
+  // get all products at the start of the program
     
+  useEffect(() =>{
+    ProductServices.getAll().then(setProducts);
   }, [])
 
   return (
@@ -81,6 +87,7 @@ const [isLoading, setIsLoading] = useState(false);
             <div className="h-full flex flex-row w-full">
               <TablesContent tables={tables} onSelect={setCurrentTableSelectedId} onAddTable={handleAddTable} onRemoveTable={handleRemoveTable} />
               <TableInformation 
+                products={products}
                 key={currentTableSelectedId} 
                 table={selectedTable} 
                 onUpdateTable={handleUpdateTable}
@@ -90,7 +97,7 @@ const [isLoading, setIsLoading] = useState(false);
           )}
 
           {currentTab === BodyTabs.ordenes && <OrdersContent/>}
-          {currentTab === BodyTabs.inventario && <InventoryContent/>}
+          {currentTab === BodyTabs.inventario && <InventoryContent products={products}/>}
           {isLoading === true && <LoadingOverlay isVisible={true} message="Procesando pago"/> }
         </main>
       </section>

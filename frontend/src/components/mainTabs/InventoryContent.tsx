@@ -1,13 +1,14 @@
 import { useState, useMemo } from "react";
 import { colorPalette } from "../../types";
 import { Product } from "../../models/product";
-import { ProductsTest } from "../../test_objects";
 
-const InventoryContent = () => {
-  const [products, setProducts] = useState<Product[]>([...ProductsTest]);
+interface InventoryContentPromps {
+  products: Product[];
+}
+
+const InventoryContent = ({ products } : InventoryContentPromps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [formData, setFormData] = useState({ name: "", price: 0 });
 
   const filteredProducts = useMemo(() => {
@@ -17,35 +18,6 @@ const InventoryContent = () => {
     );
   }, [products, searchQuery]);
 
-  const handleAddProduct = () => {
-    setEditingProduct(null);
-    setFormData({ name: "", price: 0 });
-    setIsModalOpen(true);
-  };
-
-  const handleEditProduct = (product: Product) => {
-    setEditingProduct(product);
-    setFormData({ name: product.name, price: product.price });
-    setIsModalOpen(true);
-  };
-
-  const handleDeleteProduct = (productId: number) => {
-    setProducts(prev => prev.filter(p => p.id !== productId));
-  };
-
-  const handleSaveProduct = () => {
-    if (!formData.name.trim() || formData.price <= 0) return;
-
-    if (editingProduct) {
-      setProducts(prev => prev.map(p => 
-        p.id === editingProduct.id ? { ...p, name: formData.name, price: formData.price } : p
-      ));
-    } else {
-      const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-      setProducts(prev => [...prev, { id: newId, name: formData.name, price: formData.price }]);
-    }
-    setIsModalOpen(false);
-  };
 
   return (
     <div
@@ -56,7 +28,6 @@ const InventoryContent = () => {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-white">Inventario de Productos</h1>
           <button
-            onClick={handleAddProduct}
             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 cursor-pointer"
           >
             <img className="w-5 h-5" src="/plus.png" alt="" />
@@ -147,13 +118,11 @@ const InventoryContent = () => {
                     <td className="py-5 px-6">
                       <div className="flex justify-end gap-3">
                         <button
-                          onClick={() => handleEditProduct(product)}
                           className="bg-blue-600 hover:bg-blue-700 p-2 rounded-lg cursor-pointer"
                         >
                           <img className="w-5 h-5" src="/edit_icon.png" alt="Editar" />
                         </button>
                         <button
-                          onClick={() => handleDeleteProduct(product.id)}
                           className="bg-red-600 hover:bg-red-700 p-2 rounded-lg cursor-pointer"
                         >
                           <img className="w-5 h-5" src="/trash_icon.png" alt="Eliminar" />
@@ -196,7 +165,7 @@ const InventoryContent = () => {
             style={{ backgroundColor: colorPalette.Charcoal }}
           >
             <h2 className="text-xl font-bold text-white mb-4">
-              {editingProduct ? "Editar Producto" : "Agregar Producto"}
+              Editar Producto
             </h2>
             <div className="space-y-4">
               <div>
@@ -229,7 +198,6 @@ const InventoryContent = () => {
                 Cancelar
               </button>
               <button
-                onClick={handleSaveProduct}
                 className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg cursor-pointer"
               >
                 Guardar

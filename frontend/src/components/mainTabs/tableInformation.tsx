@@ -1,11 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
-import { colorPalette, type TableInformationProps } from "../../types";
-import { ProductsTest } from "../../test_objects";
+import { colorPalette } from "../../types";
 import { Product } from "../../models/product";
 import { Order } from "../../models/order";
 import { OrderServices } from "../../services/OrderServices";
+import { Table } from "../../models/table";
 
-const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformationProps) => {
+interface TableInformationProps{
+  table: Table | undefined;
+  onUpdateTable: (updatedTable: Table) => void;
+  setIsLoading: (isLoading: boolean) => void;
+  products: Product[];
+}
+
+const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: TableInformationProps) => {
   const [activePaymentButton, setActivePaymentButton] = useState(0);
   const [amountOfPersons, setAmountOfPersons] = useState(table?.order?.guests || 0);
   const [propina, setPropina] = useState(table?.order?.tip || 0);
@@ -26,8 +33,8 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
   }, [currenProducts, propina]);
 
   const filteredProducts = useMemo(() => {
-    if(!searchBarValue.trim()) return ProductsTest
-    return ProductsTest.filter(product => product.name.toLowerCase().includes(searchBarValue));
+    if(!searchBarValue.trim()) return products
+    return products.filter(product => product.name.toLowerCase().includes(searchBarValue));
   }, [searchBarValue])
 
   // Función para sincronizar los datos locales con el componente padre (y las tarjetas)
@@ -89,6 +96,7 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
     finalOrder.tip = propina;
     finalOrder.total = totalPrice;
 
+    console.log(finalOrder);
     setIsLoading(true);
     try{
       OrderServices.createOrder(finalOrder);
@@ -259,7 +267,7 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading }: TableInformati
         </div>
         <button 
           onClick={handleProcessPayment} 
-          className="w-full bg-purple-600 hover:bg-purple-700 h-14 rounded-2xl text-white font-bold text-xl transition-colors"
+          className="cursor-pointer w-full bg-purple-600 hover:bg-purple-700 h-14 rounded-2xl text-white font-bold text-xl transition-colors"
         >
           Procesar pago
         </button>

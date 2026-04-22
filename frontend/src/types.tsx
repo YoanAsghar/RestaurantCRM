@@ -18,15 +18,6 @@ export const colorPalette = {
 
 
 
-export interface TableInformationProps{
-  table: Table | undefined;
-  onUpdateTable: (updatedTable: Table) => void;
-  setIsLoading: (isLoading: boolean) => void;
-}
 
-export interface TableCardProps {
-  table: Table;
-  onSelect: (id: number) => void;
-}
 
 

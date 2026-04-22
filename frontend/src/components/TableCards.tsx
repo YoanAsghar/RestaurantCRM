@@ -1,4 +1,10 @@
-import { colorPalette, type TableCardProps } from "../types"
+import { colorPalette } from "../types"
+import { Table } from "../models/table";
+
+interface TableCardProps {
+  table: Table;
+  onSelect: (id: number) => void;
+}
 
 const TableCards = ({table, onSelect}: TableCardProps) => {
   const guests = table.order?.guests || 0;
