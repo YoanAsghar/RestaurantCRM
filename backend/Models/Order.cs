@@ -20,6 +20,6 @@ namespace RestaurantCRM.Models
         [ForeignKey("TableId")]
         public int? TableId { get; set; }
         [ForeignKey("OrderDetailId")]
-        public ICollection<OrderDetail> OrderDetail { get; set; }
+        public ICollection<OrderDetail> OrderDetail { get; set; }sdasd
     }
 }

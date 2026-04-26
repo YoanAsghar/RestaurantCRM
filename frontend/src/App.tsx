@@ -80,11 +80,12 @@ const [isLoading, setIsLoading] = useState(false);
     <div className="flex flex-row h-screen w-screen overflow-hidden">
       <Sidebar username={"BussinesName"} setTabChange={setCurrentTab} currentTab={currentTab}/>
 
-      <section className="flex-1 h-full">
-        <main className="w-full h-full"> 
+      <section className="flex-1 h-full overflow-hidden">
+        <main className="w-full h-full flex flex-row"> 
 
-          {currentTab === BodyTabs.mesas && (
-            <div className="h-full flex flex-row w-full">
+          {/* Tab Mesas */}
+          <div className={`tab-pane ${currentTab === BodyTabs.mesas ? "active" : ""}`}>
+            <div className="tab-content-wrapper flex flex-row w-full h-full">
               <TablesContent tables={tables} onSelect={setCurrentTableSelectedId} onAddTable={handleAddTable} onRemoveTable={handleRemoveTable} />
               <TableInformation 
                 products={products}
@@ -94,10 +95,22 @@ const [isLoading, setIsLoading] = useState(false);
                 setIsLoading = {setIsLoading}
               />
             </div>
-          )}
+          </div>
 
-          {currentTab === BodyTabs.ordenes && <OrdersContent/>}
-          {currentTab === BodyTabs.inventario && <InventoryContent products={products}/>}
+          {/* Tab Ordenes */}
+          <div className={`tab-pane ${currentTab === BodyTabs.ordenes ? "active" : ""}`}>
+            <div className="tab-content-wrapper w-full h-full">
+              <OrdersContent/>
+            </div>
+          </div>
+
+          {/* Tab Inventario */}
+          <div className={`tab-pane ${currentTab === BodyTabs.inventario ? "active" : ""}`}>
+            <div className="tab-content-wrapper w-full h-full">
+              <InventoryContent products={products}/>
+            </div>
+          </div>
+
           {isLoading === true && <LoadingOverlay isVisible={true} message="Procesando pago"/> }
         </main>
       </section>

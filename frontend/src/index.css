@@ -160,3 +160,54 @@
     display: none;
   }
 }
+
+/* Animaciones para las pestañas */
+.tab-pane {
+  display: flex;
+  width: 0;
+  height: 100%;
+  overflow: hidden;
+  opacity: 0;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.tab-pane.active {
+  width: 100%;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Para asegurar que el contenido dentro no se rompa mientras el ancho cambia */
+.tab-content-wrapper {
+  min-width: 100vw; 
+  height: 100%;
+}
+
+@media (min-width: 1024px) {
+  .tab-content-wrapper {
+    min-width: calc(100vw - 250px); /* Ajuste basado en el ancho de tu Sidebar */
+  }
+}
+
+/* Animaciones verticales para TableInformation */
+.tab-pane-vertical {
+  display: flex;
+  flex-direction: column;
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+}
+
+.tab-pane-vertical.active {
+  height: 100%;
+  opacity: 1;
+}
+
+.inner-content-vertical {
+  min-height: 500px; /* Asegura que el contenido no se colapse visualmente */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}

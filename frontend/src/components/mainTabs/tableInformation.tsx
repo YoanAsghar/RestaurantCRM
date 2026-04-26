@@ -171,99 +171,111 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: Tabl
         </div>
       </div>
 
-      <div className={`flex justify-center w-full ${currentTab === true ? "bg-[#140152]" : "bg-stone-950"}`}>
-        <button className="cursor-pointer rounded-b-lg w-16 flex items-center justify-center" style={{backgroundColor: colorPalette.Navy}} onClick={() => setCurrenTab(!currentTab)}>
-          <img className="p-1" src="/swap_icon.png" alt="" />
-        </button>
-      </div>
+      {/* CONTENEDOR DE PESTAÑAS ANIMADAS */}
+      <div className="flex-1 flex flex-col overflow-hidden relative" style={{ backgroundColor: colorPalette.DeepTwilight }}>
+        
+        {/* PESTAÑA 1: PEDIDOS ACTUALES */}
+        <div className={`tab-pane-vertical ${currentTab ? "active" : ""}`}>
+          <div className="inner-content-vertical">
+            {/* Botón integrado */}
+            <div className="flex justify-center w-full shrink-0">
+              <button 
+                className="cursor-pointer rounded-b-lg w-16 flex items-center justify-center transition-transform hover:scale-110" 
+                style={{backgroundColor: colorPalette.Navy}} 
+                onClick={() => setCurrenTab(false)}
+              >
+                <img className="p-1" src="/swap_icon.png" alt="Cambiar" />
+              </button>
+            </div>
 
-      {/* PEDIDOS ACTUALES */}
-      {currentTab === true ? (
-        <div 
-          className="flex-1 flex flex-col min-h-0"
-          style={{ backgroundColor: colorPalette.DeepTwilight }}
-        >
-          <div className="flex-1 overflow-auto p-4">
-            <table className="w-full text-white">
-              <thead className="top-0" style={{ backgroundColor: colorPalette.DeepTwilight }}>
-                <tr>
-                  <th className="text-left py-3 px-2">Artículo</th>
-                  <th className="text-center py-3 px-2">Precio</th>
-                  <th className="text-center py-3 px-2">Cant.</th>
-                  <th className="w-10"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentProducts.map((detail: orderDetail, index: number) => (
-                  <tr key={index} className="border-b border-white/10">
-                    <td className="py-3 px-2">{detail.product?.name}</td>
-                    <td className="py-3 px-2 text-center">${detail.product?.price}</td>
-                    <td className="py-3 px-2 text-center">{detail.quantity}</td>
-                    <td className="py-3 px-2">
-                      <img
-                        className="cursor-pointer mx-auto hover:scale-110 transition-transform"
-                        src="/trash_icon.png"
-                        alt="Eliminar"
-                        onClick={() => removeProductFromTable(index)}
-                      />
-                    </td>
-                  </tr>
-                ))}
-                {propina !== 0 && (
+            <div className="flex-1 overflow-auto p-4">
+              <table className="w-full text-white">
+                <thead className="sticky top-0 z-10" style={{ backgroundColor: colorPalette.DeepTwilight }}>
                   <tr>
-                    <td colSpan={4} className="py-3 px-2 font-medium">
-                      Propina: ${propina}
-                    </td>
+                    <th className="text-left py-3 px-2">Artículo</th>
+                    <th className="text-center py-3 px-2">Precio</th>
+                    <th className="text-center py-3 px-2">Cant.</th>
+                    <th className="w-10"></th>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-          <div className="p-5">
-            <div className="flex justify-between items-center text-xl font-bold text-white">
-              <span>Total:</span>
-              <span>${totalPrice.toFixed(0)}</span>
+                </thead>
+                <tbody>
+                  {currentProducts.map((detail: orderDetail, index: number) => (
+                    <tr key={index} className="border-b border-white/10">
+                      <td className="py-3 px-2">{detail.product?.name}</td>
+                      <td className="py-3 px-2 text-center">${detail.product?.price}</td>
+                      <td className="py-3 px-2 text-center">{detail.quantity}</td>
+                      <td className="py-3 px-2">
+                        <img
+                          className="cursor-pointer mx-auto hover:scale-110 transition-transform"
+                          src="/trash_icon.png"
+                          alt="Eliminar"
+                          onClick={() => removeProductFromTable(index)}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                  {propina !== 0 && (
+                    <tr>
+                      <td colSpan={4} className="py-3 px-2 font-medium">
+                        Propina: ${propina}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            <div className="p-5 bg-black/20">
+              <div className="flex justify-between items-center text-xl font-bold text-white">
+                <span>Total:</span>
+                <span>${totalPrice.toFixed(0)}</span>
+              </div>
             </div>
           </div>
         </div>
-      ) : null}
 
-      {/* Agregar productos */}
-      {currentTab === false ? (
-        <div 
-          className="flex-1 flex flex-col min-h-0 bg-stone-950"
-        >
-          <h2 className="px-5 pt-5 pb-3 text-xl font-semibold text-white">
-            Agregar productos
-          </h2>
-          <div className="relative w-full px-4">
-            <img 
-              src="./search_icon.png" 
-              alt="Buscar" 
-              className="absolute left-7 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none"
-            />
-            <input 
-              onChange={(e) => setSearchBarValue(e.target.value.toLowerCase())}
-              type="text" 
-              placeholder="Buscar producto"
-              className="w-full bg-white rounded-lg p-3 pl-14 border focus:outline-none"
-            />
+        {/* PESTAÑA 2: AGREGAR PRODUCTOS */}
+        <div className={`tab-pane-vertical ${!currentTab ? "active" : ""}`}>
+          <div className="inner-content-vertical bg-stone-950">
+            {/* Botón integrado */}
+            <div className="flex justify-center w-full shrink-0">
+              <button 
+                className="cursor-pointer rounded-b-lg w-16 flex items-center justify-center transition-transform hover:scale-110" 
+                style={{backgroundColor: colorPalette.Navy}} 
+                onClick={() => setCurrenTab(true)}
+              >
+                <img className="p-1 rotate-180" src="/swap_icon.png" alt="Cambiar" />
+              </button>
+            </div>
+
+            <div className="relative w-full px-4 mb-4">
+              <img 
+                src="./search_icon.png" 
+                alt="Buscar" 
+                className="absolute left-7 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none brightness-0"
+              />
+              <input 
+                onChange={(e) => setSearchBarValue(e.target.value.toLowerCase())}
+                type="text" 
+                placeholder="Buscar producto"
+                className="w-full bg-white text-black rounded-lg p-3 pl-14 border-none focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+            <ul className="flex-1 flex flex-col w-full overflow-y-auto px-4 gap-2 pb-4">
+              {filteredProducts.map((product) => (
+                <li key={product.id + Math.random()} className="flex flex-row justify-between items-center rounded-lg text-black p-3 bg-white shadow-sm hover:bg-gray-50 transition-colors">
+                  <div className="flex flex-col">
+                    <p className="font-bold text-lg leading-tight">{product.name}</p>
+                    <p className="text-sm opacity-60 font-medium">${product.price}</p>
+                  </div>
+                  <button onClick={() => addProductToTable(product)} className="rounded-lg cursor-pointer transition-transform hover:scale-110 shadow-md"> 
+                    <img className="bg-stone-950 rounded-lg size-10 p-2.5" src="/plus.png" alt="Agregar" />
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
-          <ul className="flex flex-col w-full mt-4 overflow-y-scroll">
-            {filteredProducts.map((product) => (
-              <li key={product.name + Math.random()} className="flex flex-row ml-4 mr-4 m-1 justify-between content-between rounded-lg p-2 bg-white">
-                <div className="flex flex-row items-center">
-                  <p className="text-1lg">{product.name}</p>
-                  <p className="text-xs pl-5">${product.price}</p>
-                </div>
-                <button onClick={() => addProductToTable(product)} className="mr-5-5 pr-4 rounded-lg cursor-pointer"> 
-                  <img className="h-full w-full bg-stone-950 rounded-lg size-9" src="/plus.png" alt="" />
-                </button>
-              </li>
-            ))}
-          </ul>
         </div>
-      ) : null}
+      </div>
 
       {/* MÉTODOS DE PAGO */}
       <div className="shrink-0 bg-black p-5 space-y-4">
