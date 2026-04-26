@@ -1,6 +1,4 @@
 export class Product {
-  private static productInstances: Product[] = [];
-
   id: number;
   name: string;
   price: number;
@@ -9,10 +7,6 @@ export class Product {
     this.id = id;
     this.name = name;
     this.price = price;
-  }
-
-  public static getAllProductInstances(){
-    return Product.productInstances;
   }
 }
 

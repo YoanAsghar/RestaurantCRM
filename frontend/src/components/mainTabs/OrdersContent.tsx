@@ -1,4 +1,3 @@
-import { Users, Clock } from "lucide-react";
 import { Order } from "../../models/order";
 import { useEffect, useState } from "react";
 import { OrderServices } from "../../services/OrderServices";
@@ -18,7 +17,7 @@ export const OrdersContent = () => {
     OrderServices.getAll(page).then(setOrders);
   }, []);
 
-  const totalGeneral = orders.reduce((sum, order) => sum + order.total, 0);
+  const totalGeneral = orders.reduce((sum, order) => sum + order.totalPrice, 0);
 
   return (
     <div
@@ -51,7 +50,7 @@ export const OrdersContent = () => {
               </thead>
               <tbody>
                 {orders.map((order) => {
-                  const fecha = new Date(order.date);
+                  const fecha = new Date(order.orderDate);
                   return (
                     <tr
                       key={order.id}
@@ -71,7 +70,6 @@ export const OrdersContent = () => {
                       {/* Comensales */}
                       <td className="py-5 px-6">
                         <div className="flex items-center gap-2">
-                          <Users className="w-4 h-4" style={{ color: colorPalette.White, opacity: 0.7 }} />
                           <span className="text-sm" style={{ color: colorPalette.White }}>
                             {order.guests}
                           </span>
@@ -83,7 +81,7 @@ export const OrdersContent = () => {
                         <div className="space-y-1 max-w-xs">
                           {order.orderDetail.map((item, idx) => (
                             <div key={idx} className="text-xs" style={{ color: colorPalette.White, opacity: 0.85 }}>
-                              {item.name}
+                              {item.product?.name}
                             </div>
                           ))}
                         </div>
@@ -92,7 +90,6 @@ export const OrdersContent = () => {
                       {/* Fecha/Hora */}
                       <td className="py-5 px-6">
                         <div className="flex items-center gap-2">
-                          <Clock className="w-4 h-4" style={{ color: colorPalette.White, opacity: 0.5 }} />
                           <div>
                             <div className="text-xs" style={{ color: colorPalette.White }}>
                               {fecha.toLocaleDateString()}
@@ -106,12 +103,12 @@ export const OrdersContent = () => {
 
                       {/* Método de Pago */}
                       <td className="py-5 px-6 text-sm" style={{ color: colorPalette.White }}>
-                        {order.paymentMethod}
+                        {order.PaymentMethod}
                       </td>
 
                       {/* Total */}
                       <td className="py-5 px-6 text-right font-bold text-base" style={{ color: colorPalette.White }}>
-                        ${order.total.toFixed(2)}
+                        ${order.totalPrice.toFixed(2)}
                       </td>
                     </tr>
                   );

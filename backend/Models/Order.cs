@@ -2,6 +2,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RestaurantCRM.Models
 {
+    public enum PaymentMethod
+    {
+        CASH,
+        CARD,
+        BANK_TRANS
+    }
     [Table("orders")]
     public class Order
     {
@@ -9,14 +15,11 @@ namespace RestaurantCRM.Models
         public float TotalPrice { get; set; }
         public DateTime OrderDate { get; set; } = DateTime.Now;
         public int Guests { get; set; }
-
-        //Foreign keys
-        public int? TableId { get; set; }
+        public int Tip { get; set; }
+        public PaymentMethod PaymentMethod { get; set; } = PaymentMethod.CASH;
         [ForeignKey("TableId")]
-        public Table? Table { get; set; }
-
-        public int? OrderDetailId { get; set; }
+        public int? TableId { get; set; }
         [ForeignKey("OrderDetailId")]
-        public OrderDetail? OrderDetail { get; set; }
+        public ICollection<OrderDetail> OrderDetail { get; set; }
     }
 }

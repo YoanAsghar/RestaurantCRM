@@ -1,6 +1,6 @@
-import { Product } from "./product";
+import type { orderDetail } from "./orderDetails";
 
-enum paymentMethod{
+export enum PaymentMethod{
   CASH = "efectivo",
   CARD = "tarjeta",
   BANK_TRANS = "transferencia"
@@ -10,25 +10,23 @@ export class Order{
   public static OrderInstances: Order[] = [];
 
   id: number;
-  tableId: number;
-  orderDetail: Product[];
-  total: number;
-  date: Date;
+  totalPrice: number;
+  orderDate: Date;
   guests: number;
   tip: number;
-  paymentMethod: paymentMethod;
+  PaymentMethod: PaymentMethod;
+  tableId: number;
+  orderDetail: orderDetail[];
 
   constructor(tableId: number){
-    this.id = Order.OrderInstances.length === 0
-    ? 1
-    : Math.max(...Order.OrderInstances.map(o => o.id)) + 1;
+    this.id = 0;
     this.tableId = tableId;
     this.orderDetail = [];
-    this.total = 0;
-    this.date = new Date();
+    this.totalPrice = 0;
+    this.orderDate = new Date();
     this.guests = 0;
     this.tip = 0;
-    this.paymentMethod = paymentMethod.CASH;
+    this.PaymentMethod = PaymentMethod.CASH;
   }
 
   public static getAllOrderInstances(){

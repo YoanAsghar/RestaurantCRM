@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { colorPalette } from "../../types";
 import { Product } from "../../models/product";
-import { Order } from "../../models/order";
+import { Order, PaymentMethod } from "../../models/order";
 import { OrderServices } from "../../services/OrderServices";
 import { Table } from "../../models/table";
+import { orderDetail } from "../../models/orderDetails";
 
 interface TableInformationProps{
   table: Table | undefined;
@@ -13,12 +14,12 @@ interface TableInformationProps{
 }
 
 const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: TableInformationProps) => {
-  const [activePaymentButton, setActivePaymentButton] = useState(0);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.CASH);
   const [amountOfPersons, setAmountOfPersons] = useState(table?.order?.guests || 0);
   const [propina, setPropina] = useState(table?.order?.tip || 0);
   const [currentTab, setCurrenTab] = useState(true);
   const [searchBarValue, setSearchBarValue] = useState("");
-  const [currenProducts, setCurrentProducts] = useState<Product[]>(table?.order?.orderDetail || []);
+  const [currentProducts, setCurrentProducts] = useState<Product[]>([]);
   const [totalPrice, setTotalPrice] = useState(0);
 
   useEffect(() => {
@@ -28,23 +29,23 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: Tabl
   }, [table?.id]);
 
   useEffect(() => {
-    const productsTotal = currenProducts.reduce((sum, item) => sum + item.price, 0);
+    const productsTotal = currentProducts.reduce((sum, item) => sum + (item.product?.price || 0), 0);
     setTotalPrice(productsTotal + propina);
-  }, [currenProducts, propina]);
+  }, [currentProducts, propina]);
 
   const filteredProducts = useMemo(() => {
     if(!searchBarValue.trim()) return products
     return products.filter(product => product.name.toLowerCase().includes(searchBarValue));
-  }, [searchBarValue])
+  }, [searchBarValue, products])
 
   // Función para sincronizar los datos locales con el componente padre (y las tarjetas)
-  const syncWithParent = (guests: number, orderDetail: Product[], tip: number) => {
+  const syncWithParent = (guests: number, orderDetail: orderDetail[], tip: number) => {
     if (!table) return;
     const updatedOrder = new Order(table.id);
     updatedOrder.guests = guests;
     updatedOrder.orderDetail = orderDetail;
     updatedOrder.tip = tip;
-    updatedOrder.total = orderDetail.reduce((sum, item) => sum + item.price, 0) + tip;
+    updatedOrder.totalPrice = orderDetail.reduce((sum, item) => sum + (item.product?.price || 0), 0) + tip;
 
     onUpdateTable({
       ...table,
@@ -54,22 +55,27 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: Tabl
 
   function handlePersonsChange(value: number) {
     setAmountOfPersons(value);
-    syncWithParent(value, currenProducts, propina);
+    syncWithParent(value, currentProducts, propina);
   }
 
   function handlePropinaChange(value: number) {
     setPropina(value);
-    syncWithParent(amountOfPersons, currenProducts, value);
+    syncWithParent(amountOfPersons, currentProducts, value);
   }
 
   function addProductToTable(item: Product){
-    const newItems = [...currenProducts, item];
+    const newItems : Product[] = [];
+    
+    currentProducts.forEach((element: orderDetail) => {
+      newItems.push(element.product);
+    })
+
     setCurrentProducts(newItems);
     syncWithParent(amountOfPersons, newItems, propina);
   }
 
   function removeProductFromTable(index: number){
-    const newItems = currenProducts.filter((_, i) => i !== index);
+    const newItems = currentProducts.filter((_, i) => i !== index);
     setCurrentProducts(newItems);
     syncWithParent(amountOfPersons, newItems, propina);
   }
@@ -89,14 +95,33 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: Tabl
 
   function handleProcessPayment() {
     if (!table) return;
-    
-    const finalOrder = new Order(table.id);
-    finalOrder.guests = amountOfPersons;
-    finalOrder.orderDetail = currenProducts;
-    finalOrder.tip = propina;
-    finalOrder.total = totalPrice;
 
-    console.log(finalOrder);
+    //forEachProductCrete
+    let productCounts = new Map<number , number>();
+    products.forEach((product: Product) => {
+      if(productCounts.has(product.id)){
+        productCounts.set(product.id, productCounts.get(product.id)! + 1);
+      }
+      else{
+        productCounts.set(product.id, 1);
+      }
+    });
+
+    const orderDetails: orderDetail[] = Array.from(productCounts.entries()).map(([productId, quantity]) => ({
+
+      id: 0,
+      productId: productId,
+      quantity: quantity,
+      product: products.find(p => p.id === productId)
+    }));
+
+    const finalOrder = new Order(table.id);
+    finalOrder.totalPrice = totalPrice;
+    finalOrder.guests = amountOfPersons;
+    finalOrder.tip = propina;
+    finalOrder.PaymentMethod = paymentMethod;
+    finalOrder.orderDetail = orderDetails;
+
     setIsLoading(true);
     try{
       OrderServices.createOrder(finalOrder);
@@ -170,10 +195,10 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: Tabl
                 </tr>
               </thead>
               <tbody>
-                {currenProducts.map((product: Product, index: number) => (
+                {currentProducts.map((product: orderDetail, index: number) => (
                   <tr key={index} className="border-b border-white/10">
-                    <td className="py-3 px-2">{product.name}</td>
-                    <td className="py-3 px-2 text-center">${product.price}</td>
+                    <td className="py-3 px-2">{product.product?.name}</td>
+                    <td className="py-3 px-2 text-center">${product.product?.price}</td>
                     <td className="py-3 px-2 text-center">✗</td>
                     <td className="py-3 px-2">
                       <img
@@ -247,20 +272,20 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: Tabl
         <h2 className="text-2xl font-semibold text-white">Métodos de pago</h2>
         <div className="grid grid-cols-3 gap-3">
           <PaymentButton
-            active={activePaymentButton === 1}
-            onClick={() => setActivePaymentButton(1)}
-            icon="/currency_icon.png"
+            active={paymentMethod === PaymentMethod.CASH}
+            onClick={() => setPaymentMethod(PaymentMethod.CASH)}
+            icon="/dollar_icon.png"
             label="Efectivo"
           />
           <PaymentButton
-            active={activePaymentButton === 2}
-            onClick={() => setActivePaymentButton(2)}
-            icon="/dollar_icon.png"
+            active={paymentMethod === PaymentMethod.BANK_TRANS}
+            onClick={() => setPaymentMethod(PaymentMethod.BANK_TRANS)}
+            icon="/currency_icon.png"
             label="Transferencia"
           />
           <PaymentButton
-            active={activePaymentButton === 3}
-            onClick={() => setActivePaymentButton(3)}
+            active={paymentMethod === PaymentMethod.CARD}
+            onClick={() => setPaymentMethod(PaymentMethod.CARD)}
             icon="/credit_card.png"
             label="Tarjeta"
           />
