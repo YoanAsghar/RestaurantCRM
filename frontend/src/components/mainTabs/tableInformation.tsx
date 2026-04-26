@@ -19,7 +19,7 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: Tabl
   const [propina, setPropina] = useState(table?.order?.tip || 0);
   const [currentTab, setCurrenTab] = useState(true);
   const [searchBarValue, setSearchBarValue] = useState("");
-  const [currentProducts, setCurrentProducts] = useState<Product[]>([]);
+  const [currentProducts, setCurrentProducts] = useState<orderDetail[]>([]);
   const [totalPrice, setTotalPrice] = useState(0);
 
   useEffect(() => {
@@ -29,7 +29,7 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: Tabl
   }, [table?.id]);
 
   useEffect(() => {
-    const productsTotal = currentProducts.reduce((sum, item) => sum + (item.product?.price || 0), 0);
+    const productsTotal = currentProducts.reduce((sum, item) => sum + ((item.product?.price || 0) * item.quantity), 0);
     setTotalPrice(productsTotal + propina);
   }, [currentProducts, propina]);
 
@@ -45,7 +45,7 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: Tabl
     updatedOrder.guests = guests;
     updatedOrder.orderDetail = orderDetail;
     updatedOrder.tip = tip;
-    updatedOrder.totalPrice = orderDetail.reduce((sum, item) => sum + (item.product?.price || 0), 0) + tip;
+    updatedOrder.totalPrice = orderDetail.reduce((sum, item) => sum + ((item.product?.price || 0) * item.quantity), 0) + tip;
 
     onUpdateTable({
       ...table,
@@ -64,20 +64,38 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: Tabl
   }
 
   function addProductToTable(item: Product){
-    const newItems : Product[] = [];
-    
-    currentProducts.forEach((element: orderDetail) => {
-      newItems.push(element.product);
-    })
+    const existingDetailIndex = currentProducts.findIndex(detail => detail.productId === item.id);
+    let newDetails: orderDetail[];
 
-    setCurrentProducts(newItems);
-    syncWithParent(amountOfPersons, newItems, propina);
+    if (existingDetailIndex >= 0) {
+      newDetails = currentProducts.map((detail, index) => 
+        index === existingDetailIndex 
+          ? { ...detail, quantity: detail.quantity + 1 }
+          : detail
+      );
+    } else {
+      const newDetail = new orderDetail(0, item.id, item, 1);
+      newDetails = [...currentProducts, newDetail];
+    }
+
+    setCurrentProducts(newDetails);
+    syncWithParent(amountOfPersons, newDetails, propina);
   }
 
   function removeProductFromTable(index: number){
-    const newItems = currentProducts.filter((_, i) => i !== index);
-    setCurrentProducts(newItems);
-    syncWithParent(amountOfPersons, newItems, propina);
+    const detail = currentProducts[index];
+    let newDetails: orderDetail[];
+
+    if (detail.quantity > 1) {
+      newDetails = currentProducts.map((d, i) => 
+        i === index ? { ...d, quantity: d.quantity - 1 } : d
+      );
+    } else {
+      newDetails = currentProducts.filter((_, i) => i !== index);
+    }
+
+    setCurrentProducts(newDetails);
+    syncWithParent(amountOfPersons, newDetails, propina);
   }
 
   function resetTableData(){
@@ -96,31 +114,12 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: Tabl
   function handleProcessPayment() {
     if (!table) return;
 
-    //forEachProductCrete
-    let productCounts = new Map<number , number>();
-    products.forEach((product: Product) => {
-      if(productCounts.has(product.id)){
-        productCounts.set(product.id, productCounts.get(product.id)! + 1);
-      }
-      else{
-        productCounts.set(product.id, 1);
-      }
-    });
-
-    const orderDetails: orderDetail[] = Array.from(productCounts.entries()).map(([productId, quantity]) => ({
-
-      id: 0,
-      productId: productId,
-      quantity: quantity,
-      product: products.find(p => p.id === productId)
-    }));
-
     const finalOrder = new Order(table.id);
     finalOrder.totalPrice = totalPrice;
     finalOrder.guests = amountOfPersons;
     finalOrder.tip = propina;
     finalOrder.PaymentMethod = paymentMethod;
-    finalOrder.orderDetail = orderDetails;
+    finalOrder.orderDetail = currentProducts;
 
     setIsLoading(true);
     try{
@@ -142,15 +141,15 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: Tabl
     <div className="h-full w-full lg:w-[30%] flex flex-col overflow-hidden">
       {/* CABECERA */}
       <div 
-        className="shrink-0 p-4 flex flex-col sm:flex-row gap-4 orderDetail-start sm:orderDetail-center justify-between"
+        className="shrink-0 p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between"
         style={{ backgroundColor: colorPalette.Navy }}
       >
-        <div className="flex orderDetail-center gap-3">
+        <div className="flex items-center gap-3">
           <h2 className="text-2xl font-bold text-white">{`Mesa ${table?.id}`}</h2>
         </div>
 
         <div className="flex flex-wrap gap-4">
-          <div className="flex orderDetail-center gap-2">
+          <div className="flex items-center gap-2">
             <label className="text-white text-sm">Personas:</label>
             <input
               type="text"
@@ -160,7 +159,7 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: Tabl
             />
           </div>
 
-          <div className="flex orderDetail-center gap-2">
+          <div className="flex items-center gap-2">
             <label className="text-white text-sm">Propina:</label>
             <input
               type="text"
@@ -172,8 +171,8 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: Tabl
         </div>
       </div>
 
-      <div className="flex justify-center w-full" style={{backgroundColor: colorPalette.DeepTwilight}}>
-        <button className="cursor-pointer rounded-b-lg w-16 flex orderDetail-center justify-center" style={{backgroundColor: colorPalette.Navy}} onClick={() => setCurrenTab(!currentTab)}>
+      <div className={`flex justify-center w-full ${currentTab === true ? "bg-[#140152]" : "bg-stone-950"}`}>
+        <button className="cursor-pointer rounded-b-lg w-16 flex items-center justify-center" style={{backgroundColor: colorPalette.Navy}} onClick={() => setCurrenTab(!currentTab)}>
           <img className="p-1" src="/swap_icon.png" alt="" />
         </button>
       </div>
@@ -190,16 +189,16 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: Tabl
                 <tr>
                   <th className="text-left py-3 px-2">Artículo</th>
                   <th className="text-center py-3 px-2">Precio</th>
-                  <th className="text-center py-3 px-2">Servido</th>
+                  <th className="text-center py-3 px-2">Cant.</th>
                   <th className="w-10"></th>
                 </tr>
               </thead>
               <tbody>
-                {currentProducts.map((product: orderDetail, index: number) => (
+                {currentProducts.map((detail: orderDetail, index: number) => (
                   <tr key={index} className="border-b border-white/10">
-                    <td className="py-3 px-2">{product.product?.name}</td>
-                    <td className="py-3 px-2 text-center">${product.product?.price}</td>
-                    <td className="py-3 px-2 text-center">✗</td>
+                    <td className="py-3 px-2">{detail.product?.name}</td>
+                    <td className="py-3 px-2 text-center">${detail.product?.price}</td>
+                    <td className="py-3 px-2 text-center">{detail.quantity}</td>
                     <td className="py-3 px-2">
                       <img
                         className="cursor-pointer mx-auto hover:scale-110 transition-transform"
@@ -221,7 +220,7 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: Tabl
             </table>
           </div>
           <div className="p-5">
-            <div className="flex justify-between orderDetail-center text-xl font-bold text-white">
+            <div className="flex justify-between items-center text-xl font-bold text-white">
               <span>Total:</span>
               <span>${totalPrice.toFixed(0)}</span>
             </div>
@@ -232,8 +231,7 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: Tabl
       {/* Agregar productos */}
       {currentTab === false ? (
         <div 
-          className="flex-1 flex flex-col min-h-0"
-          style={{ backgroundColor: colorPalette.DeepTwilight }}
+          className="flex-1 flex flex-col min-h-0 bg-stone-950"
         >
           <h2 className="px-5 pt-5 pb-3 text-xl font-semibold text-white">
             Agregar productos
@@ -248,18 +246,18 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: Tabl
               onChange={(e) => setSearchBarValue(e.target.value.toLowerCase())}
               type="text" 
               placeholder="Buscar producto"
-              className="w-full bg-indigo-950 text-white rounded-lg p-3 pl-14 border border-purple-950 focus:outline-none focus:border-purple-400"
+              className="w-full bg-white rounded-lg p-3 pl-14 border focus:outline-none"
             />
           </div>
           <ul className="flex flex-col w-full mt-4 overflow-y-scroll">
             {filteredProducts.map((product) => (
-              <li key={product.name + Math.random()} className="flex flex-row ml-4 mr-4 m-1 justify-between content-between rounded-lg text-white p-2 bg-purple-950">
-                <div className="flex flex-row orderDetail-center">
+              <li key={product.name + Math.random()} className="flex flex-row ml-4 mr-4 m-1 justify-between content-between rounded-lg p-2 bg-white">
+                <div className="flex flex-row items-center">
                   <p className="text-1lg">{product.name}</p>
                   <p className="text-xs pl-5">${product.price}</p>
                 </div>
                 <button onClick={() => addProductToTable(product)} className="mr-5-5 pr-4 rounded-lg cursor-pointer"> 
-                  <img className="h-full w-full bg-indigo-950 rounded-lg size-9" src="/plus.png" alt="" />
+                  <img className="h-full w-full bg-stone-950 rounded-lg size-9" src="/plus.png" alt="" />
                 </button>
               </li>
             ))}
@@ -304,7 +302,7 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: Tabl
 const PaymentButton = ({ active, onClick, icon, label }: any) => (
   <div
     onClick={onClick}
-    className={`flex flex-col orderDetail-center justify-center p-3 rounded-2xl cursor-pointer transition-all
+    className={`flex flex-col items-center justify-center p-3 rounded-2xl cursor-pointer transition-all
 ${active 
 ? "bg-purple-950 scale-105" 
 : "bg-zinc-900 hover:bg-zinc-800"}`}

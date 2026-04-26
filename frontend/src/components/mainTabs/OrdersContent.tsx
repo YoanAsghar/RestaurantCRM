@@ -79,11 +79,16 @@ export const OrdersContent = () => {
                       {/* Items */}
                       <td className="py-5 px-6">
                         <div className="space-y-1 max-w-xs">
-                          {order.orderDetail.map((item, idx) => (
+                          {order.orderDetail && order.orderDetail.map((item, idx) => (
                             <div key={idx} className="text-xs" style={{ color: colorPalette.White, opacity: 0.85 }}>
-                              {item.product?.name}
+                              {item.quantity}x {item.product?.name}
                             </div>
                           ))}
+                          {(!order.orderDetail || order.orderDetail.length === 0) && (
+                            <div className="text-xs italic opacity-50" style={{ color: colorPalette.White }}>
+                              Sin items
+                            </div>
+                          )}
                         </div>
                       </td>
 

@@ -8,7 +8,7 @@ interface TableCardProps {
 
 const TableCards = ({table, onSelect}: TableCardProps) => {
   const guests = table.order?.guests || 0;
-  const productsTotal = table.order?.orderDetail.reduce((sum, item) => sum + (item.product?.price || 0), 0) || 0;
+  const productsTotal = table.order?.orderDetail?.reduce((sum, item) => sum + ((item.product?.price || 0) * item.quantity), 0) || 0;
   const tip = table.order?.tip || 0;
   const totalPrice = productsTotal + tip;
 

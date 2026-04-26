@@ -32,23 +32,10 @@ const InventoryContent = ({ products } : InventoryContentPromps) => {
       style={{ backgroundColor: colorPalette.DeepTwilight }}
     >
       <div className="p-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-white">Inventario de Productos</h1>
-          <button
-            onClick={() => {
-              setAddFormData({ name: "", price: 0 });
-              setIsAddModalOpen(true);
-            }}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 cursor-pointer"
-          >
-            <img className="w-5 h-5" src="/plus.png" alt="" />
-            Agregar Producto
-          </button>
-        </div>
 
-        <div className="mb-4 relative">
+        <div className="mb-4 h-12 relative flex flex-column">
           <img 
-            src="./search_icon.png" 
+            src="./search_icon_white.png" 
             alt="Buscar" 
             className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none"
           />
@@ -59,6 +46,15 @@ const InventoryContent = ({ products } : InventoryContentPromps) => {
             placeholder="Buscar producto..."
             className="w-full bg-black text-white rounded-lg p-3 pl-12 border border-gray-700 focus:outline-none focus:border-purple-500"
           />
+          <button
+            onClick={() => {
+              setAddFormData({ name: "", price: 0 });
+              setIsAddModalOpen(true);
+            }}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 cursor-pointer ml-4"
+          >
+            <img className="w-5 h-5" src="/plus.png" alt="" />
+          </button>
         </div>
 
         <div
