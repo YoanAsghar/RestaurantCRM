@@ -7,6 +7,7 @@ namespace RestaurantCRM.Models
     public class OrderDetail
     {
         public int Id { get; set; }
+        public int OrderId { get; set; }
         [ForeignKey("ProductId")]
         public int ProductId { get; set; }
         public Product? Product { get; set; }

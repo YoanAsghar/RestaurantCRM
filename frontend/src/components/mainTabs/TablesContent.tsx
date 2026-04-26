@@ -1,4 +1,4 @@
-import { colorPalette} from "../../types"
+import { colorPalette} from "../../colorPallete"
 import TableCards from "../TableCards"
 import { Table } from "../../models/table";
 

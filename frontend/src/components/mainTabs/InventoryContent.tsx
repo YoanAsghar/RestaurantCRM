@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { colorPalette } from "../../types";
+import { colorPalette } from "../../colorPallete";
 import { Product } from "../../models/product";
 
 interface InventoryContentPromps {

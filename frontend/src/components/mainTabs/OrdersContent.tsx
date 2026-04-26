@@ -1,6 +1,4 @@
 import { Order } from "../../models/order";
-import { useEffect, useState } from "react";
-import { OrderServices } from "../../services/OrderServices";
 
 const colorPalette = {
   DeepTwilight: "#140152",
@@ -9,13 +7,14 @@ const colorPalette = {
   White: "#f4f4f8"
 };
 
-export const OrdersContent = () => {
-  const [page, setPage] = useState(1);
-  const [orders, setOrders] = useState<Order[]>([]);
+interface ordersContentProps {
+  orders: Order[];
+  page: number;
+  setPage: (page: number) => void;
+}
 
-  useEffect(() => {
-    OrderServices.getAll(page).then(setOrders);
-  }, []);
+export const OrdersContent = ({orders, page} : ordersContentProps) => {
+
 
   const totalGeneral = orders.reduce((sum, order) => sum + order.totalPrice, 0);
 
@@ -36,16 +35,51 @@ export const OrdersContent = () => {
                   className="border-b"
                   style={{
                     backgroundColor: colorPalette.Navy,
-                    borderColor: colorPalette.DeepTwilight
+                    borderColor: colorPalette.DeepTwilight,
                   }}
                 >
-                  <th className="text-left py-4 px-6 font-semibold text-sm" style={{ color: colorPalette.White }}>ID Orden</th>
-                  <th className="text-left py-4 px-6 font-semibold text-sm" style={{ color: colorPalette.White }}>Mesa</th>
-                  <th className="text-left py-4 px-6 font-semibold text-sm" style={{ color: colorPalette.White }}>Comensales</th>
-                  <th className="text-left py-4 px-6 font-semibold text-sm" style={{ color: colorPalette.White }}>Items</th>
-                  <th className="text-left py-4 px-6 font-semibold text-sm" style={{ color: colorPalette.White }}>Fecha/Hora</th>
-                  <th className="text-left py-4 px-6 font-semibold text-sm" style={{ color: colorPalette.White }}>Pago</th>
-                  <th className="text-right py-4 px-6 font-semibold text-sm" style={{ color: colorPalette.White }}>Total</th>
+                  <th
+                    className="text-left py-4 px-6 font-semibold text-sm"
+                    style={{ color: colorPalette.White }}
+                  >
+                    ID Orden
+                  </th>
+                  <th
+                    className="text-left py-4 px-6 font-semibold text-sm"
+                    style={{ color: colorPalette.White }}
+                  >
+                    Mesa
+                  </th>
+                  <th
+                    className="text-left py-4 px-6 font-semibold text-sm"
+                    style={{ color: colorPalette.White }}
+                  >
+                    Comensales
+                  </th>
+                  <th
+                    className="text-left py-4 px-6 font-semibold text-sm"
+                    style={{ color: colorPalette.White }}
+                  >
+                    Items
+                  </th>
+                  <th
+                    className="text-left py-4 px-6 font-semibold text-sm"
+                    style={{ color: colorPalette.White }}
+                  >
+                    Fecha/Hora
+                  </th>
+                  <th
+                    className="text-left py-4 px-6 font-semibold text-sm"
+                    style={{ color: colorPalette.White }}
+                  >
+                    Pago
+                  </th>
+                  <th
+                    className="text-right py-4 px-6 font-semibold text-sm"
+                    style={{ color: colorPalette.White }}
+                  >
+                    Total
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -58,19 +92,28 @@ export const OrdersContent = () => {
                       style={{ borderColor: `${colorPalette.Navy}60` }}
                     >
                       {/* ID */}
-                      <td className="py-5 px-6 font-mono text-sm font-semibold" style={{ color: colorPalette.White }}>
+                      <td
+                        className="py-5 px-6 font-mono text-sm font-semibold"
+                        style={{ color: colorPalette.White }}
+                      >
                         {order.id}
                       </td>
 
                       {/* Mesa */}
-                      <td className="py-5 px-6 text-sm font-medium" style={{ color: colorPalette.White }}>
+                      <td
+                        className="py-5 px-6 text-sm font-medium"
+                        style={{ color: colorPalette.White }}
+                      >
                         {order.tableId}
                       </td>
 
                       {/* Comensales */}
                       <td className="py-5 px-6">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm" style={{ color: colorPalette.White }}>
+                          <span
+                            className="text-sm"
+                            style={{ color: colorPalette.White }}
+                          >
                             {order.guests}
                           </span>
                         </div>
@@ -79,13 +122,25 @@ export const OrdersContent = () => {
                       {/* Items */}
                       <td className="py-5 px-6">
                         <div className="space-y-1 max-w-xs">
-                          {order.orderDetail && order.orderDetail.map((item, idx) => (
-                            <div key={idx} className="text-xs" style={{ color: colorPalette.White, opacity: 0.85 }}>
-                              {item.quantity}x {item.product?.name}
-                            </div>
-                          ))}
-                          {(!order.orderDetail || order.orderDetail.length === 0) && (
-                            <div className="text-xs italic opacity-50" style={{ color: colorPalette.White }}>
+                          {order.orderDetail &&
+                            order.orderDetail.map((item, idx) => (
+                              <div
+                                key={idx}
+                                className="text-xs"
+                                style={{
+                                  color: colorPalette.White,
+                                  opacity: 0.85,
+                                }}
+                              >
+                                {item.quantity}x {item.product?.name}
+                              </div>
+                            ))}
+                          {(!order.orderDetail ||
+                            order.orderDetail.length === 0) && (
+                            <div
+                              className="text-xs italic opacity-50"
+                              style={{ color: colorPalette.White }}
+                            >
                               Sin items
                             </div>
                           )}
@@ -96,10 +151,16 @@ export const OrdersContent = () => {
                       <td className="py-5 px-6">
                         <div className="flex items-center gap-2">
                           <div>
-                            <div className="text-xs" style={{ color: colorPalette.White }}>
+                            <div
+                              className="text-xs"
+                              style={{ color: colorPalette.White }}
+                            >
                               {fecha.toLocaleDateString()}
                             </div>
-                            <div className="text-xs opacity-60" style={{ color: colorPalette.White }}>
+                            <div
+                              className="text-xs opacity-60"
+                              style={{ color: colorPalette.White }}
+                            >
                               {fecha.toLocaleTimeString()}
                             </div>
                           </div>
@@ -107,12 +168,18 @@ export const OrdersContent = () => {
                       </td>
 
                       {/* Método de Pago */}
-                      <td className="py-5 px-6 text-sm" style={{ color: colorPalette.White }}>
-                        {order.PaymentMethod}
+                      <td
+                        className="py-5 px-6 text-sm"
+                        style={{ color: colorPalette.White }}
+                      >
+                        {order.paymentMethod}
                       </td>
 
                       {/* Total */}
-                      <td className="py-5 px-6 text-right font-bold text-base" style={{ color: colorPalette.White }}>
+                      <td
+                        className="py-5 px-6 text-right font-bold text-base"
+                        style={{ color: colorPalette.White }}
+                      >
                         ${order.totalPrice.toFixed(2)}
                       </td>
                     </tr>
@@ -124,14 +191,21 @@ export const OrdersContent = () => {
                   className="border-t-2"
                   style={{
                     backgroundColor: colorPalette.Navy,
-                    borderColor: colorPalette.DeepTwilight
+                    borderColor: colorPalette.DeepTwilight,
                   }}
                 >
-                  <td colSpan={6} className="py-4 px-6 text-base font-bold text-right" style={{ color: colorPalette.White }}>
-                    TOTAL GENERAL
+                  <td
+                    colSpan={6}
+                    className="py-4 px-6 text-base font-bold text-right text-xl"
+                    style={{ color: colorPalette.White }}
+                  >
+                      Total Órdenes:  {orders.length}
                   </td>
-                  <td className="py-4 px-6 text-right font-bold text-xl" style={{ color: colorPalette.White }}>
-                    ${totalGeneral.toFixed(2)}
+                  <td
+                    className="py-4 px-6 text-right font-bold text-xl"
+                    style={{ color: colorPalette.White }}
+                  >
+                    TOTAL GENERAL: ${totalGeneral.toFixed(2)}
                   </td>
                 </tr>
               </tfoot>
@@ -139,13 +213,6 @@ export const OrdersContent = () => {
           </div>
         </div>
 
-        {/* Estadísticas */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
-          <div className="p-6 rounded-xl" style={{ backgroundColor: colorPalette.Charcoal }}>
-            <p className="text-xs opacity-70 mb-2" style={{ color: colorPalette.White }}>Total Órdenes</p>
-            <p className="text-3xl font-bold" style={{ color: colorPalette.White }}>{orders.length}</p>
-          </div>
-        </div>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { colorPalette } from "../../types";
+import { colorPalette } from "../../colorPallete";
 import { Product } from "../../models/product";
 import { Order, PaymentMethod } from "../../models/order";
 import { OrderServices } from "../../services/OrderServices";
@@ -74,7 +74,7 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: Tabl
           : detail
       );
     } else {
-      const newDetail = new orderDetail(0, item.id, item, 1);
+      const newDetail = new orderDetail(0, item.id, item, 1, 0);
       newDetails = [...currentProducts, newDetail];
     }
 
@@ -111,21 +111,21 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: Tabl
     }
   }
 
-  function handleProcessPayment() {
+  async function handleProcessPayment() {
     if (!table) return;
 
     const finalOrder = new Order(table.id);
     finalOrder.totalPrice = totalPrice;
     finalOrder.guests = amountOfPersons;
     finalOrder.tip = propina;
-    finalOrder.PaymentMethod = paymentMethod;
+    finalOrder.paymentMethod = paymentMethod;
     finalOrder.orderDetail = currentProducts;
 
     setIsLoading(true);
     try{
-      OrderServices.createOrder(finalOrder);
+      await OrderServices.createOrder(finalOrder);
     }catch(err){
-      console.error(err)
+      throw new Error(`Error creating order ${err}`);
     }finally{
       setIsLoading(false);
     }

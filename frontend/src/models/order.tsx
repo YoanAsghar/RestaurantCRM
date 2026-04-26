@@ -1,9 +1,9 @@
 import type { orderDetail } from "./orderDetails";
 
 export enum PaymentMethod{
-  CASH = "efectivo",
-  CARD = "tarjeta",
-  BANK_TRANS = "transferencia"
+  CASH = "CASH",
+  CARD = "CARD",
+  BANK_TRANS = "BANK_TRANS"
 }
 
 export class Order{
@@ -14,7 +14,7 @@ export class Order{
   orderDate: Date;
   guests: number;
   tip: number;
-  PaymentMethod: PaymentMethod;
+  paymentMethod: PaymentMethod;
   tableId: number;
   orderDetail: orderDetail[];
 
@@ -26,7 +26,7 @@ export class Order{
     this.orderDate = new Date();
     this.guests = 0;
     this.tip = 0;
-    this.PaymentMethod = PaymentMethod.CASH;
+    this.paymentMethod = PaymentMethod.CASH;
   }
 
   public static getAllOrderInstances(){

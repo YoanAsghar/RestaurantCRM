@@ -21,12 +21,15 @@ public class OrderController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<Order>>> GetOrders([FromQuery] int pageSize, [FromQuery] int page)
     {
-        var tableList = _context.Orders
+        var orders = await _context.Orders
+          .Include(o => o.OrderDetail)
+            .ThenInclude(od => od.Product)
           .OrderByDescending(o => o.Id)
           .Skip((page - 1) * pageSize)
           .Take(pageSize)
-          .ToList();
-        return Ok(tableList);
+          .OrderBy(o => o.Id)
+          .ToListAsync();
+        return Ok(orders);
     }
 
     //

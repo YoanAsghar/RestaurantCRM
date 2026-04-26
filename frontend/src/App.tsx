@@ -1,8 +1,8 @@
 
+import { OrderServices } from "./services/OrderServices";
 import { useEffect, useState } from "react";
 import Sidebar from "./components/Sidebar";
 import { Table } from "./models/table";
-import { BodyTabs } from "./types";
 import InventoryContent from "./components/mainTabs/InventoryContent";
 import { OrdersContent } from "./components/mainTabs/OrdersContent";
 import TablesContent from "./components/mainTabs/TablesContent";
@@ -11,70 +11,99 @@ import LoadingOverlay from "./components/LoadingOverlay";
 import { TableServices } from "./services/TableServices";
 import type { Product } from "./models/product";
 import { ProductServices } from "./services/ProductServices";
+import type { Order } from "./models/order";
+
+enum BodyTabs {
+  mesas = "mesas",
+  ordenes = "ordenes",
+  inventario = "inventario",
+  domicilios = "domicilios"
+}
 
 const App = () => {
-const [currentTab, setCurrentTab] = useState(BodyTabs.mesas);
+  const [currentTab, setCurrentTab] = useState(BodyTabs.mesas);
 
-  //Table states
-const [tables, setTables] = useState<Table[]>([]);
-const [currentTableSelectedId, setCurrentTableSelectedId] = useState<number>(1);
+  //Table related status and functions
+  const [tables, setTables] = useState<Table[]>([]);
+  const [currentTableSelectedId, setCurrentTableSelectedId] = useState<number>(1);
 
-  //Prodcut states
-  const [products, setProducts] = useState<Product[]>([]);
-
-
-const [isLoading, setIsLoading] = useState(false);
-  
-  //
-  // TABLES RELATED FUNCTIONS
-  //
 
   // Retrieve all the created tables when the app loads first
   useEffect(() => {
     TableServices.getAll().then(setTables);
   }, [])
 
- const selectedTable = tables.find(t => t.id == currentTableSelectedId)
+  const selectedTable = tables.find(t => t.id == currentTableSelectedId)
 
- const handleUpdateTable = (updatedTable: Table) => {
-   setTables(prev => prev.map(t => t.id === updatedTable.id ? updatedTable : t));
- };
+  const handleUpdateTable = (updatedTable: Table) => {
+    setTables(prev => prev.map(t => t.id === updatedTable.id ? updatedTable : t));
+  };
 
- const handleAddTable = async () => {
+  const handleAddTable = async () => {
     setIsLoading(true);
     try {
-        await TableServices.createTable();
-        const updatedTables = await TableServices.getAll();
-        setTables(updatedTables);
+      await TableServices.createTable();
+      const updatedTables = await TableServices.getAll();
+      setTables(updatedTables);
     } catch (error) {
-        console.error("Error adding table:", error);
+      console.error("Error adding table:", error);
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
- };
+  };
 
- const handleRemoveTable = async () => {
+  const handleRemoveTable = async () => {
     setIsLoading(true);
-      try {
-        await TableServices.deleteTable();
-        const updatedTables = await TableServices.getAll();
-        setTables(updatedTables);
+    try {
+      await TableServices.deleteTable();
+      const updatedTables = await TableServices.getAll();
+      setTables(updatedTables);
     } catch (error) {
-        console.error("Error removing table:", error);
+      console.error("Error removing table:", error);
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
- };
+  };
+
+
 
   //
-  // PRODUCTS RELATED FUNCTIONS
+  // Product states and functions
   //
-  
+  const [products, setProducts] = useState<Product[]>([]);
+
   // get all products at the start of the program
-    
   useEffect(() =>{
     ProductServices.getAll().then(setProducts);
   }, [])
+
+
+
+  //
+  // Order states and functions
+  //
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [ordersSectionPage, setOrdersSectionPage] = useState(1);
+
+  //get all orders when page first loads
+  useEffect(() => {
+    OrderServices.getAll(ordersSectionPage).then(setOrders);
+  }, []);
+
+  // get all orders when changing tabs
+  useEffect(() => {
+    setIsLoading(true);
+    OrderServices.getAll(ordersSectionPage).then(setOrders);
+    setIsLoading(false);
+  }, [currentTab]);
+
+
+  //
+  // Other states and functions
+  //
+  const [isLoading, setIsLoading] = useState(false);
+
+
 
   return (
     <div className="flex flex-row h-screen w-screen overflow-hidden">
@@ -100,7 +129,7 @@ const [isLoading, setIsLoading] = useState(false);
           {/* Tab Ordenes */}
           <div className={`tab-pane ${currentTab === BodyTabs.ordenes ? "active" : ""}`}>
             <div className="tab-content-wrapper w-full h-full">
-              <OrdersContent/>
+              <OrdersContent orders={orders} setPage={setOrdersSectionPage} page={ordersSectionPage}/>
             </div>
           </div>
 

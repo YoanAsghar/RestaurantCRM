@@ -19,7 +19,6 @@ namespace RestaurantCRM.Models
         public PaymentMethod PaymentMethod { get; set; } = PaymentMethod.CASH;
         [ForeignKey("TableId")]
         public int? TableId { get; set; }
-        [ForeignKey("OrderDetailId")]
-        public ICollection<OrderDetail> OrderDetail { get; set; }sdasd
+        public ICollection<OrderDetail> OrderDetail { get; set; } = new List<OrderDetail>();
     }
 }
