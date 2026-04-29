@@ -1,6 +1,3 @@
-import { Table } from "./models/table";
-
-
 export enum BodyTabs {
   mesas = "mesas",
   ordenes = "ordenes",

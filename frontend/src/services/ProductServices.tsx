@@ -27,5 +27,30 @@ export const ProductServices = {
     if(!response.ok) throw new Error("Error creating product");
     
   return await response.json();
+  },
+  
+  editProduct: async(product: Product): Promise<Product> => {
+    const response = await fetch(API_URL + `/${product.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(product)
+    })
+    
+    console.log(product);
+
+    if(!response.ok) throw  new Error (`Error editing product to ${product.name}`);
+
+  return await response.json();
+  },
+  
+  deleteProduct: async(id: number): Promise<Product> => {
+    const response = await fetch(API_URL + `/${id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json"}
+    })
+
+    if(!response.ok) throw new Error (`Error deleting product by id ${id}`);
+
+    return await response.json();
   }
 }

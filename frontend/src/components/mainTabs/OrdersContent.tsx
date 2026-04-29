@@ -13,7 +13,7 @@ interface ordersContentProps {
   setPage: (page: number) => void;
 }
 
-export const OrdersContent = ({orders, page} : ordersContentProps) => {
+export const OrdersContent = ({orders, page, setPage} : ordersContentProps) => {
 
 
   const totalGeneral = orders.reduce((sum, order) => sum + order.totalPrice, 0);
@@ -28,6 +28,23 @@ export const OrdersContent = ({orders, page} : ordersContentProps) => {
           className="rounded-xl overflow-hidden shadow-2xl"
           style={{ backgroundColor: colorPalette.Charcoal }}
         >
+          <div className="py-4 flex flex-row justify-between items-center w-full px-8" style={{backgroundColor: colorPalette.DeepTwilight}}>
+            <button 
+              onClick={() => setPage(Math.max(1, page - 1))}
+              className="w-14 h-14 flex items-center justify-center rounded-xl cursor-pointer transition-all hover:bg-white/20 bg-zinc-950 text-white text-2xl font-bold"
+            >
+              {"<"}
+            </button>
+
+            <p className="text-white font-bold text-xl uppercase tracking-widest">{`Página ${page}`}</p>
+
+            <button 
+              onClick={() => setPage(page + 1)}
+              className="w-14 h-14 flex items-center justify-center rounded-xl cursor-pointer transition-all hover:bg-white/20 bg-zinc-950 text-white text-2xl font-bold"
+            >
+              {">"}
+            </button>
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>

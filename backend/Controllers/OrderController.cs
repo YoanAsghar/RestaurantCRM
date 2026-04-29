@@ -23,7 +23,7 @@ public class OrderController : ControllerBase
     {
         var orders = await _context.Orders
           .Include(o => o.OrderDetail)
-            .ThenInclude(od => od.Product)
+          .ThenInclude(od => od.Product)
           .OrderByDescending(o => o.Id)
           .Skip((page - 1) * pageSize)
           .Take(pageSize)

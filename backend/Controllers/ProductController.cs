@@ -28,6 +28,7 @@ public class ProductController : ControllerBase
         }
         var productsFromDatabase = await _context.Products
           .Where(p => p.Name.ToLower().Contains(search.ToLower()))
+          .OrderBy(p => p.Id)
           .ToListAsync();
         return Ok(productsFromDatabase);
     }

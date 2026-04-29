@@ -87,7 +87,7 @@ const App = () => {
 
   //get all orders when page first loads
   useEffect(() => {
-    OrderServices.getAll(ordersSectionPage).then(setOrders);
+    OrderServices.getAll(ordersSectionPage).then(setOrders).then;
   }, []);
 
   // get all orders when changing tabs
@@ -95,7 +95,7 @@ const App = () => {
     setIsLoading(true);
     OrderServices.getAll(ordersSectionPage).then(setOrders);
     setIsLoading(false);
-  }, [currentTab]);
+  }, [currentTab, ordersSectionPage]);
 
 
   //
@@ -129,14 +129,14 @@ const App = () => {
           {/* Tab Ordenes */}
           <div className={`tab-pane ${currentTab === BodyTabs.ordenes ? "active" : ""}`}>
             <div className="tab-content-wrapper w-full h-full">
-              <OrdersContent orders={orders} setPage={setOrdersSectionPage} page={ordersSectionPage}/>
+              <OrdersContent orders={orders} setPage={setOrdersSectionPage} page={ordersSectionPage} />
             </div>
           </div>
 
           {/* Tab Inventario */}
           <div className={`tab-pane ${currentTab === BodyTabs.inventario ? "active" : ""}`}>
             <div className="tab-content-wrapper w-full h-full">
-              <InventoryContent products={products}/>
+              <InventoryContent products={products} setProducts={setProducts} setIsLoading={setIsLoading}/>
             </div>
           </div>
 

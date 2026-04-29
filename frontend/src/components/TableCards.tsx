@@ -1,4 +1,4 @@
-import { colorPalette } from "../types"
+import { colorPalette } from "../colorPallete"
 import { Table } from "../models/table";
 
 interface TableCardProps {
