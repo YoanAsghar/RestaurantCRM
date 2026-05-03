@@ -16,7 +16,7 @@ const TablesContent = ({tables, onSelect, onAddTable, onRemoveTable}: TableConte
           <h2 className="text-gray-400 m-0">Estado de las mesas: </h2>
         <div className="flex flex-row">
           <button onClick={onAddTable} className="bg-green-600 hover:bg-green-700 p-2 m-5 flex flex-row justify-center rounded-lg items-center cursor-pointer">
-            <img className="size-7"  src="./plus.png" alt="" />
+            <img className="size-7"  src="/plus.png" alt="" />
           </button>
           <button onClick={onRemoveTable} className="bg-red-600 hover:bg-red-700 p-2 m-5 flex flex-row justify-center rounded-lg items-center cursor-pointer">
             <img className="size-7" src="/trash_icon.png" alt="Eliminar" />

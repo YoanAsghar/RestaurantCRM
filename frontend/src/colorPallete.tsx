@@ -2,7 +2,8 @@ export enum BodyTabs {
   mesas = "mesas",
   ordenes = "ordenes",
   inventario = "inventario",
-  domicilios = "domicilios"
+  domicilios = "domicilios",
+  admin = "admin"
 }
 
 export const colorPalette = {

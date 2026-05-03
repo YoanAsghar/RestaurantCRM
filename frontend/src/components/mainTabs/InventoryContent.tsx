@@ -37,7 +37,7 @@ const InventoryContent = ({ products, setProducts, setIsLoading } : InventoryCon
       <div className="p-8">
         <div className="mb-4 h-12 relative flex flex-column">
           <img
-            src="./search_icon_white.png"
+            src="/search_icon_white.png"
             alt="Buscar"
             className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none"
           />

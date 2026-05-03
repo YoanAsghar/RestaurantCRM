@@ -249,7 +249,7 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: Tabl
 
             <div className="relative w-full px-4 mb-4">
               <img 
-                src="./search_icon.png" 
+                src="/search_icon.png" 
                 alt="Buscar" 
                 className="absolute left-7 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none brightness-0"
               />

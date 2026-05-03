@@ -12,12 +12,14 @@ import { TableServices } from "./services/TableServices";
 import type { Product } from "./models/product";
 import { ProductServices } from "./services/ProductServices";
 import type { Order } from "./models/order";
+import AdminPanel from "./components/mainTabs/AdminPanel";
 
 enum BodyTabs {
   mesas = "mesas",
   ordenes = "ordenes",
   inventario = "inventario",
-  domicilios = "domicilios"
+  domicilios = "domicilios",
+  admin = "admin"
 }
 
 const App = () => {
@@ -137,6 +139,13 @@ const App = () => {
           <div className={`tab-pane ${currentTab === BodyTabs.inventario ? "active" : ""}`}>
             <div className="tab-content-wrapper w-full h-full">
               <InventoryContent products={products} setProducts={setProducts} setIsLoading={setIsLoading}/>
+            </div>
+          </div>
+
+          {/* Admin tab*/}
+          <div className={`tab-pane ${currentTab === BodyTabs.admin ? "active" : ""}`}>
+            <div className="tab-content-wrapper w-full h-full">
+              <AdminPanel />
             </div>
           </div>
 
