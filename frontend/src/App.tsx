@@ -108,11 +108,11 @@ const App = () => {
 
 
   return (
-    <div className="flex flex-row h-screen w-screen overflow-hidden">
+    <div className="flex flex-col h-screen w-screen overflow-hidden">
       <Sidebar username={"BussinesName"} setTabChange={setCurrentTab} currentTab={currentTab}/>
 
-      <section className="flex-1 h-full overflow-hidden">
-        <main className="w-full h-full flex flex-row"> 
+      <section className="flex-1 overflow-hidden">
+        <main className="w-full h-full flex flex-row relative"> 
 
           {/* Tab Mesas */}
           <div className={`tab-pane ${currentTab === BodyTabs.mesas ? "active" : ""}`}>

@@ -31,7 +31,7 @@ const InventoryContent = ({ products, setProducts, setIsLoading } : InventoryCon
 
   return (
     <div
-      className="h-screen w-full overflow-auto"
+      className="h-full w-full overflow-auto"
       style={{ backgroundColor: colorPalette.DeepTwilight }}
     >
       <div className="p-8">

@@ -8,73 +8,87 @@ interface SideBarProps {
 }
 
 const Sidebar = ({username, setTabChange, currentTab} : SideBarProps) => {
-  const [isCollapsed, setIsCollapsed] = useState(true);
   const [selectedTab, setSelectedTab] = useState(1);
 
   return (
-    <aside
-      className={`h-screen ${isCollapsed ? "w-40" : "w-12"} bg-white border-r border-gray-200 shadow-sm flex flex-col transition-all duration-300`}
+    <nav
+      className={`h-15 bg-[#22007c] border-r shadow-sm flex flex-row transition-all duration-300 items-center`}
     >
       {/* Logo / Header */}
-        <div className="p-3 min-h-12">
-        {isCollapsed 
-          ? ( <img src="/logoipsum.png" alt="" /> )
-          : ( <img className="size-6" src="/logoipsum-small.png" alt="" />)}
-        </div>
+      <div className="p-3 min-h-12">
+        <img className="w-40" src="/logoipsum.png" alt="" />
+      </div>
       {/* Menú */}
-      <nav className="flex-1 py-2">
-        <ul className="space-y-0.5">
-          <li onClick={() => {setTabChange(BodyTabs.mesas); setSelectedTab(1)}} className={`flex flex-row items-center hover:bg-gray-100 px-3 py-3 rounded-lg cursor-pointer ${selectedTab === 1 ? "bg-gray-100" : ""}`}>
-            <img className="size-6" src="/home_icon.png" alt="" />
-            {!isCollapsed 
-              ? ""
-              : <a href="#" className="flex items-center gap-2 px-4 text-gray-700">Mesas</a>
-            }
+      <nav className="flex-1 py-2 pl-10">
+        <ul className="space-y-0.5 flex flex-row">
+          <li
+            onClick={() => {
+              setTabChange(BodyTabs.mesas);
+              setSelectedTab(1);
+            }}
+            className={`flex flex-row items-center hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 1 ? "bg-black invert" : ""}`}
+          >
+            <img className="size-6 invert" src="/home_icon.png" alt="" />
+            <a href="#" className="flex items-center gap-2 px-4 text-white">
+              Mesas
+            </a>
           </li>
-          <li onClick={() => {setTabChange(BodyTabs.ordenes); setSelectedTab(2)}} className={`flex flex-row items-center hover:bg-gray-100 px-3 py-3 rounded-lg cursor-pointer ${selectedTab === 2 ? "bg-gray-100 text-white" : ""}`}>
-            <img className="size-6" src="/orders.png" alt="" />
-            {!isCollapsed 
-              ? ""
-              : <a href="#" className="flex items-center gap-2 px-4 text-gray-700 ">Ordenes</a>
-            }
+          <li
+            onClick={() => {
+              setTabChange(BodyTabs.ordenes);
+              setSelectedTab(2);
+            }}
+            className={`flex flex-row items-center hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 2 ? "bg-black invert" : ""}`}
+          >
+            <img className="size-6 invert" src="/orders.png" alt="" />
+              <a
+                href="#"
+                className="flex items-center gap-2 px-4 text-white "
+              >
+                Ordenes
+              </a>
           </li>
-          <li onClick={() => {setTabChange(BodyTabs.inventario); setSelectedTab(3)}} className={`flex flex-row items-center hover:bg-gray-100 px-3 py-3 rounded-lg cursor-pointer ${selectedTab === 3 ? "bg-gray-100 text-white" : ""}`}>
-            <img className="size-6" src="/inventory.png" alt="" />
-            {!isCollapsed 
-              ? ""
-              : <a href="#" className="flex items-center gap-2 px-4 text-gray-700 ">Inventario</a>
-            }
+          <li
+            onClick={() => {
+              setTabChange(BodyTabs.inventario);
+              setSelectedTab(3);
+            }}
+            className={`flex flex-row items-center hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 3 ? "bg-black invert" : ""}`}
+          >
+            <img className="size-6 invert" src="/inventory.png" alt="" />
+              <a
+                href="#"
+                className="flex items-center gap-2 px-4 text-white"
+              >
+                Inventario
+              </a>
           </li>
-          <li onClick={() => {setTabChange(BodyTabs.admin); setSelectedTab(1)}} className={`flex flex-row items-center hover:bg-gray-100 px-3 py-3 rounded-lg cursor-pointer ${selectedTab === 1 ? "bg-gray-100" : ""}`}>
-            <img className="size-6" src="/admin.png" alt="" />
-            {!isCollapsed 
-              ? ""
-              : <a href="#" className="flex items-center gap-2 px-4 text-gray-700">Admin</a>
-            }
+          <li
+            onClick={() => {
+              setTabChange(BodyTabs.admin);
+              setSelectedTab(4);
+            }}
+            className={`flex flex-row items-center hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 4 ? "bg-black invert" : ""}`}
+          >
+            <img className="size-6 invert" src="/admin.png" alt="" />
+              <a
+                href="#"
+                className="flex items-center gap-2 px-4 text-white"
+              >
+                Admin
+              </a>
           </li>
         </ul>
       </nav>
 
       {/* Footer */}
-      <div className="flex flex-col">
-        <div className="px-3 flex flex-row items-center hover:bg-gray-100 py-3 rounded-lg">
-          <button onClick={() => setIsCollapsed(!isCollapsed)} className="flex flex-row items-center cursor-pointer">
-            <img src={`${isCollapsed ? "/collapse.png" : "./expand.png"}`} alt="Cerrar sesion" className="size-6" />
-            {!isCollapsed 
-            ? ""
-            : <p className="text-sm px-4 text-gray-500">Colapsar</p>
-            }
-          </button>
-        </div>
-        <div className="px-3 flex flex-row items-center cursor-pointer hover:bg-gray-100 py-3 rounded-lg">
-          <img src="/logout.png" alt="Cerrar sesion" className="size-6" />
-          {!isCollapsed 
-            ? ""
-            : <p className="text-sm px-4 text-gray-500">{username}</p>
-            }
+      <div className="flex flex-row">
+        <div className="px-3 flex flex-row items-center cursor-pointer py-3 rounded-lg hover:bg-black hover:invert">
+          <img src="/logout.png" alt="Cerrar sesion" className="size-6 invert" />
+            <p className="text-sm px-4 text-white">{username}</p>
         </div>
       </div>
-    </aside>
+    </nav>
   );
 };
 
