@@ -13,6 +13,7 @@ import type { Product } from "./models/product";
 import { ProductServices } from "./services/ProductServices";
 import type { Order } from "./models/order";
 import AdminPanel from "./components/mainTabs/AdminPanel";
+import Login from "./components/Login";
 
 enum BodyTabs {
   mesas = "mesas",
@@ -25,7 +26,17 @@ enum BodyTabs {
 const App = () => {
   const [currentTab, setCurrentTab] = useState(BodyTabs.mesas);
 
+  //
+  //  Authentication 
+  //
+
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [username, setUsername] = useState<string>("");
+  const [role, setRole] = useState("");
+
+  //
   //Table related status and functions
+  //
   const [tables, setTables] = useState<Table[]>([]);
   const [currentTableSelectedId, setCurrentTableSelectedId] = useState<number>(1);
 
@@ -33,7 +44,7 @@ const App = () => {
   // Retrieve all the created tables when the app loads first
   useEffect(() => {
     TableServices.getAll().then(setTables);
-  }, [])
+  }, [isAuthenticated])
 
   const selectedTable = tables.find(t => t.id == currentTableSelectedId)
 
@@ -77,7 +88,7 @@ const App = () => {
   // get all products at the start of the program
   useEffect(() =>{
     ProductServices.getAll().then(setProducts);
-  }, [])
+  }, [isAuthenticated])
 
 
 
@@ -90,7 +101,7 @@ const App = () => {
   //get all orders when page first loads
   useEffect(() => {
     OrderServices.getAll(ordersSectionPage).then(setOrders).then;
-  }, []);
+  }, [isAuthenticated]);
 
   // get all orders when changing tabs
   useEffect(() => {
@@ -109,7 +120,8 @@ const App = () => {
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden">
-      <Sidebar username={"BussinesName"} setTabChange={setCurrentTab} currentTab={currentTab}/>
+      <Login isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} setIsLoading={setIsLoading} setRole={setRole} setUsername={setUsername}/>
+      <Sidebar setIsAuthenticated={setIsAuthenticated} username={username} setTabChange={setCurrentTab} currentTab={currentTab}/>
 
       <section className="flex-1 overflow-hidden">
         <main className="w-full h-full flex flex-row relative"> 
@@ -149,7 +161,7 @@ const App = () => {
             </div>
           </div>
 
-          {isLoading === true && <LoadingOverlay isVisible={true} message="Procesando pago"/> }
+          {isLoading === true && <LoadingOverlay isVisible={true} message="Cargando..."/> }
         </main>
       </section>
     </div>

@@ -5,9 +5,10 @@ interface SideBarProps {
   username: string;
   setTabChange: (tab: BodyTabs) => void;
   currentTab: BodyTabs;
+  setIsAuthenticated: (isAuthenticated: boolean) => void;
 }
 
-const Sidebar = ({username, setTabChange, currentTab} : SideBarProps) => {
+const Sidebar = ({username, setTabChange, currentTab, setIsAuthenticated} : SideBarProps) => {
   const [selectedTab, setSelectedTab] = useState(1);
 
   return (
@@ -83,9 +84,9 @@ const Sidebar = ({username, setTabChange, currentTab} : SideBarProps) => {
 
       {/* Footer */}
       <div className="flex flex-row">
-        <div className="px-3 flex flex-row items-center cursor-pointer py-3 rounded-lg hover:bg-black hover:invert">
+        <div onClick={() => setIsAuthenticated(false)} className="px-3 flex flex-row items-center cursor-pointer py-3 rounded-lg hover:bg-black hover:invert">
+          <p className="text-sm px-4 text-white">{username.toUpperCase()}</p>
           <img src="/logout.png" alt="Cerrar sesion" className="size-6 invert" />
-            <p className="text-sm px-4 text-white">{username}</p>
         </div>
       </div>
     </nav>
