@@ -2,12 +2,11 @@ import { useState } from "react";
 
 
 const Sidebar = () => {
-  const [isCollapsed, setIsCollapsed] = useState(true);
   const [selectedTab, setSelectedTab] = useState(1);
 
   return (
     <aside
-      className={`h-screen ${isCollapsed ? "w-40" : "w-12"} bg-white border-r border-gray-200 shadow-sm flex flex-col transition-all duration-300`}
+      className={`h-screen w-60 bg-white border-r border-gray-200 shadow-sm flex flex-col transition-all duration-300`}
     >
       {/* Menú */}
       <nav className="flex-1 py-2">
