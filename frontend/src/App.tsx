@@ -1,7 +1,7 @@
 
 import { OrderServices } from "./services/OrderServices";
 import { useEffect, useState } from "react";
-import Sidebar from "./components/Sidebar";
+import Navbar from "./components/Navbar";
 import { Table } from "./models/table";
 import InventoryContent from "./components/mainTabs/InventoryContent";
 import { OrdersContent } from "./components/mainTabs/OrdersContent";
@@ -12,7 +12,7 @@ import { TableServices } from "./services/TableServices";
 import type { Product } from "./models/product";
 import { ProductServices } from "./services/ProductServices";
 import type { Order } from "./models/order";
-import AdminPanel from "./components/mainTabs/AdminPanel";
+import AdminPanel from "./components/AdminTabs/AdminPanel";
 import Login from "./components/Login";
 
 enum BodyTabs {
@@ -39,6 +39,7 @@ const App = () => {
   //
   const [tables, setTables] = useState<Table[]>([]);
   const [currentTableSelectedId, setCurrentTableSelectedId] = useState<number>(1);
+  const [selectedTable, setSelectedTable] = useState<Table>(tables[0] || new Table(1));
 
 
   // Retrieve all the created tables when the app loads first
@@ -46,7 +47,6 @@ const App = () => {
     TableServices.getAll().then(setTables);
   }, [isAuthenticated])
 
-  const selectedTable = tables.find(t => t.id == currentTableSelectedId)
 
   const handleUpdateTable = (updatedTable: Table) => {
     setTables(prev => prev.map(t => t.id === updatedTable.id ? updatedTable : t));
@@ -120,8 +120,8 @@ const App = () => {
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden">
-      <Login isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} setIsLoading={setIsLoading} setRole={setRole} setUsername={setUsername}/>
-      <Sidebar setIsAuthenticated={setIsAuthenticated} username={username} setTabChange={setCurrentTab} currentTab={currentTab}/>
+      <Login isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} setIsLoading={setIsLoading} setRole={setRole} setUsername={setUsername} role={role}/>
+      <Navbar setIsAuthenticated={setIsAuthenticated} username={username} setTabChange={setCurrentTab} currentTab={currentTab} setUsername={setUsername} setRole={setRole}/>
 
       <section className="flex-1 overflow-hidden">
         <main className="w-full h-full flex flex-row relative"> 
@@ -129,7 +129,7 @@ const App = () => {
           {/* Tab Mesas */}
           <div className={`tab-pane ${currentTab === BodyTabs.mesas ? "active" : ""}`}>
             <div className="tab-content-wrapper flex flex-row w-full h-full">
-              <TablesContent tables={tables} onSelect={setCurrentTableSelectedId} onAddTable={handleAddTable} onRemoveTable={handleRemoveTable} />
+              <TablesContent selectedTable={selectedTable} tables={tables} onSelect={setCurrentTableSelectedId} onAddTable={handleAddTable} onRemoveTable={handleRemoveTable} role={role} setSelectedTable={setSelectedTable}/>
               <TableInformation 
                 products={products}
                 key={currentTableSelectedId} 
@@ -157,7 +157,7 @@ const App = () => {
           {/* Admin tab*/}
           <div className={`tab-pane ${currentTab === BodyTabs.admin ? "active" : ""}`}>
             <div className="tab-content-wrapper w-full h-full">
-              <AdminPanel />
+              <AdminPanel products={products} setProducts={setProducts} setIsLoading={setIsLoading}/>
             </div>
           </div>
 

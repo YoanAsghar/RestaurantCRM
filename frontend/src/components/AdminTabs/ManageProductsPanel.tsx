@@ -1,3 +1,4 @@
+
 import { useState, useMemo } from "react";
 import { colorPalette } from "../../colorPallete";
 import { Product } from "../../models/product";
@@ -9,7 +10,7 @@ interface InventoryContentPromps {
   setIsLoading: (isLoading: boolean) => void;
 }
 
-const InventoryContent = ({ products, setProducts, setIsLoading } : InventoryContentPromps) => {
+const ManageProductsPanel = ({ products, setProducts, setIsLoading } : InventoryContentPromps) => {
   const [searchQuery, setSearchQuery] = useState("");
   
   // Estados para Crear
@@ -31,10 +32,10 @@ const InventoryContent = ({ products, setProducts, setIsLoading } : InventoryCon
 
   return (
     <div
-      className="h-full w-full overflow-auto"
+      className="h-screen w-full overflow-auto"
       style={{ backgroundColor: colorPalette.DeepTwilight }}
     >
-      <div className="p-8">
+      <div className="p-8 h-full">
         <div className="mb-4 h-12 relative flex flex-column">
           <img
             src="/search_icon_white.png"
@@ -48,6 +49,16 @@ const InventoryContent = ({ products, setProducts, setIsLoading } : InventoryCon
             placeholder="Buscar producto..."
             className="w-full bg-black text-white rounded-lg p-3 pl-12 border border-gray-700 focus:outline-none focus:border-purple-500"
           />
+          <button
+            onClick={() => {
+              setAddFormData({ name: "", price: 0 });
+              setIsAddModalOpen(true);
+            }}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 cursor-pointer ml-4"
+          >
+            Agregar producto
+            <img className="w-5 h-5" src="/plus.png" alt="" />
+          </button>
         </div>
 
         <div
@@ -86,6 +97,7 @@ const InventoryContent = ({ products, setProducts, setIsLoading } : InventoryCon
                     className="text-right py-4 px-6 font-semibold text-sm"
                     style={{ color: colorPalette.White }}
                   >
+                    Acciones
                   </th>
                 </tr>
               </thead>
@@ -116,6 +128,48 @@ const InventoryContent = ({ products, setProducts, setIsLoading } : InventoryCon
                     </td>
                     <td className="py-5 px-6">
                       <div className="flex justify-end gap-3">
+                        <button
+                          onClick={() => {
+                            setEditFormData({
+                              id: product.id,
+                              name: product.name,
+                              price: product.price,
+                            });
+                            setIsEditModalOpen(true);
+                          }}
+                          className="bg-blue-600 hover:bg-blue-700 p-2 rounded-lg cursor-pointer flex flex-row"
+                        >
+                          <p className="pr-2">Editar</p>
+                          <img
+                            className="w-5 h-5"
+                            src="/edit.png"
+                            alt="Editar"
+                          />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setIsLoading(true);
+                            ProductServices.deleteProduct(product.id)
+                              .then((productDeleted) => {
+                                setProducts(
+                                  products.filter(
+                                    (p) => p.id !== productDeleted.id,
+                                  ),
+                                );
+                              })
+                              .finally(() => {
+                                setIsLoading(false);
+                              });
+                          }}
+                          className="bg-red-600 hover:bg-red-700 p-2 rounded-lg cursor-pointer flex flex-row"
+                        >
+                          <p className="pr-2">Eliminar</p>
+                          <img
+                            className="w-5 h-5 invert"
+                            src="/trash_icon.png"
+                            alt="Eliminar"
+                          />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -284,4 +338,4 @@ const InventoryContent = ({ products, setProducts, setIsLoading } : InventoryCon
   );
 };
 
-export default InventoryContent;
+export default ManageProductsPanel;
