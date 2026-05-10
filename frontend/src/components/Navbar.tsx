@@ -35,7 +35,7 @@ const Navbar = ({username, setTabChange, setIsAuthenticated, setUsername, setRol
               setTabChange(BodyTabs.mesas);
               setSelectedTab(1);
             }}
-            className={`flex flex-row items-center hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 1 ? "bg-black invert" : ""}`}
+            className={`flex flex-row items-center transition-transform hover:scale-110 hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 1 ? "bg-black invert scale-90" : ""}`}
           >
             <img className="size-6 invert" src="/home_icon.png" alt="" />
             <a href="#" className="flex items-center gap-2 px-4 text-white">
@@ -46,10 +46,9 @@ const Navbar = ({username, setTabChange, setIsAuthenticated, setUsername, setRol
             onClick={() => {
               setTabChange(BodyTabs.inventario);
               setSelectedTab(3);
-            }}
-            className={`flex flex-row items-center hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 3 ? "bg-black invert" : ""}`}
+            }}className={`flex flex-row items-center transition-transform hover:scale-110 hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 3 ? "bg-black invert scale-90" : ""}`}
           >
-            <img className="size-6 invert" src="/inventory.png" alt="" />
+            <img className="size-6 invert" src="/food.png" alt="" />
               <a
                 href="#"
                 className="flex items-center gap-2 px-4 text-white"
@@ -61,8 +60,7 @@ const Navbar = ({username, setTabChange, setIsAuthenticated, setUsername, setRol
             onClick={() => {
               setTabChange(BodyTabs.ordenes);
               setSelectedTab(2);
-            }}
-            className={`flex flex-row items-center hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 2 ? "bg-black invert" : ""}`}
+            }}className={`flex flex-row items-center transition-transform hover:scale-110 hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 2 ? "bg-black invert scale-90" : ""}`}
           >
             <img className="size-6 invert" src="/orders.png" alt="" />
               <a
@@ -76,8 +74,7 @@ const Navbar = ({username, setTabChange, setIsAuthenticated, setUsername, setRol
             onClick={() => {
               setTabChange(BodyTabs.admin);
               setSelectedTab(4);
-            }}
-            className={`flex flex-row items-center hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 4 ? "bg-black invert" : ""}`}
+            }}className={`flex flex-row items-center transition-transform hover:scale-110 hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 4 ? "bg-black invert scale-90" : ""}`}
           >
             <img className="size-6 invert" src="/admin.png" alt="" />
               <a

@@ -1,5 +1,4 @@
-
-import { useState, useMemo } from "react";
+import { useState, useMemo, type ChangeEvent } from "react";
 import { colorPalette } from "../../colorPallete";
 import { Product } from "../../models/product";
 import { ProductServices } from "../../services/ProductServices";
@@ -8,20 +7,63 @@ interface InventoryContentPromps {
   products: Product[];
   setProducts: (product: Product[]) => void;
   setIsLoading: (isLoading: boolean) => void;
+  productCategories: string[];
 }
 
-const ManageProductsPanel = ({ products, setProducts, setIsLoading } : InventoryContentPromps) => {
+const ManageProductsPanel = ({ products, setProducts, setIsLoading, productCategories } : InventoryContentPromps) => {
   const [searchQuery, setSearchQuery] = useState("");
   
   // Estados para Crear
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [addFormData, setAddFormData] = useState({ name: "", price: 0 });
+  const [addFormData, setAddFormData] = useState({ name: "", price: 0, category: "", description: "", image: ""});
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
 
 
   // Estados para Editar
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editFormData, setEditFormData] = useState({ id: 0, name: "", price: 0 });
+  const [editFormData, setEditFormData] = useState({ id: 0, name: "", price: 0, description: "", image: ""});
+  
+  async function HandleImageEditing(event: ChangeEvent<HTMLInputElement>): Promise<void>{
+    const file = event.target.files?.[0];
+    if(file){
+      const reader = new FileReader();
 
+      reader.onload = () => {
+        setEditFormData((prevData) => ({
+          ...prevData,
+          image: reader.result as string
+        }));
+      }
+
+      reader.onerror = (error) => {
+        console.error(`Error reading file: ${error}`);
+      }
+
+      reader.readAsDataURL(file);
+    }
+  }
+
+  async function HandleImageAdding(event: ChangeEvent<HTMLInputElement>): Promise<void>{
+    const file = event.target.files?.[0];
+    if(file){
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        setAddFormData((prevData) => ({
+          ...prevData,
+          image: reader.result as string
+        }));
+      }
+
+      reader.onerror = (error) => {
+        console.error(`Error reading file: ${error}`);
+      }
+
+      reader.readAsDataURL(file);
+    }
+  }
+
+  //Filtering products
   const filteredProducts = useMemo(() => {
     if (!searchQuery.trim()) return products;
     return products.filter(p => 
@@ -51,7 +93,7 @@ const ManageProductsPanel = ({ products, setProducts, setIsLoading } : Inventory
           />
           <button
             onClick={() => {
-              setAddFormData({ name: "", price: 0 });
+              setAddFormData({ name: "", price: 0, category: "", description: "", image: ""});
               setIsAddModalOpen(true);
             }}
             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 cursor-pointer ml-4"
@@ -94,6 +136,12 @@ const ManageProductsPanel = ({ products, setProducts, setIsLoading } : Inventory
                     Precio
                   </th>
                   <th
+                    className="text-left py-4 px-6 font-semibold text-sm"
+                    style={{ color: colorPalette.White }}
+                  >
+                    Descripcion
+                  </th>
+                  <th
                     className="text-right py-4 px-6 font-semibold text-sm"
                     style={{ color: colorPalette.White }}
                   >
@@ -126,6 +174,12 @@ const ManageProductsPanel = ({ products, setProducts, setIsLoading } : Inventory
                     >
                       ${product.price.toLocaleString()}
                     </td>
+                    <td
+                      className="py-5 px-6 font-mono text-sm font-semibold over"
+                      style={{ color: colorPalette.White }}
+                    >
+                      {product.description}
+                    </td>
                     <td className="py-5 px-6">
                       <div className="flex justify-end gap-3">
                         <button
@@ -134,6 +188,8 @@ const ManageProductsPanel = ({ products, setProducts, setIsLoading } : Inventory
                               id: product.id,
                               name: product.name,
                               price: product.price,
+                              description: product.description,
+                              image: product.image
                             });
                             setIsEditModalOpen(true);
                           }}
@@ -221,6 +277,45 @@ const ManageProductsPanel = ({ products, setProducts, setIsLoading } : Inventory
                   className="w-full bg-black text-white rounded-lg p-3 border border-gray-700 focus:outline-none focus:border-purple-500"
                 />
               </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">
+                  Descripcion
+                </label>
+                <textarea
+                  value={addFormData.description || ""}
+                  onChange={(e) =>
+                    setAddFormData({
+                      ...addFormData,
+                      description: e.target.value,
+                    })
+                  }
+                  className="w-full bg-black text-white rounded-lg p-3 border border-gray-700 focus:outline-none focus:border-purple-500 resize-none"
+                  placeholder="Ej. 80Gr de carne de res, y salsa de la casa"
+                />
+              </div>
+            </div>
+            <div className="pt-2">
+              <label className="block text-sm text-gray-400 m-1">
+                Agregar imagen
+              </label>
+              <input
+                onChange={HandleImageAdding}
+                type="file"
+                accept="image/*"
+                className="text-white w-full h-20 flex rounded-lg justify-center items-center cursor-pointer"
+                style={{ backgroundColor: colorPalette.DeepTwilight }}
+              />
+              {addFormData.image && (
+                <>
+                  <label className="block text-sm text-gray-400 m-1">
+                    Previsualizacion
+                  </label>
+                  <img
+                    className="border-2 rounded-lg border-indigo-500 max-h-32 object-contain mx-auto"
+                    src={addFormData.image}
+                  />
+                </>
+              )}
             </div>
             <div className="flex gap-3 mt-6">
               <button
@@ -236,6 +331,9 @@ const ManageProductsPanel = ({ products, setProducts, setIsLoading } : Inventory
                     0,
                     addFormData.name,
                     addFormData.price,
+                    addFormData.category, //The category, the backend doesnt need it so its just an empty string;
+                    addFormData.description,
+                    addFormData.image
                   );
                   ProductServices.createProduct(newProduct)
                     .then((newProduct) => {
@@ -257,7 +355,7 @@ const ManageProductsPanel = ({ products, setProducts, setIsLoading } : Inventory
 
       {/* MODAL PARA EDITAR */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 overflow-scroll">
           <div
             className="rounded-xl p-6 w-96"
             style={{ backgroundColor: colorPalette.Charcoal }}
@@ -295,6 +393,44 @@ const ManageProductsPanel = ({ products, setProducts, setIsLoading } : Inventory
                   className="w-full bg-black text-white rounded-lg p-3 border border-gray-700 focus:outline-none focus:border-purple-500"
                 />
               </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">
+                  Descripcion
+                </label>
+                <textarea
+                  value={editFormData.description || ""}
+                  onChange={(e) =>
+                    setEditFormData({
+                      ...editFormData,
+                      description: e.target.value,
+                    })
+                  }
+                  className="w-full h-32 bg-black text-white rounded-lg p-3 border border-gray-700 focus:outline-none focus:border-purple-500 resize-none"
+                />
+              </div>
+            </div>
+            <div className="pt-2">
+              <label className="block text-sm text-gray-400 m-1">
+                Cambiar imagen
+              </label>
+              <input
+                onChange={HandleImageEditing}
+                type="file"
+                accept="image/*"
+                className="text-white w-full h-20 flex rounded-lg justify-center items-center cursor-pointer"
+                style={{ backgroundColor: colorPalette.DeepTwilight }}
+              />
+              {editFormData.image && (
+                <>
+                  <label className="block text-sm text-gray-400 m-1">
+                    Previsualizacion
+                  </label>
+                  <img
+                    className="border-2 rounded-lg border-indigo-500 max-h-32 object-contain mx-auto"
+                    src={editFormData.image}
+                  />
+                </>
+              )}
             </div>
             <div className="flex gap-3 mt-6">
               <button
@@ -311,6 +447,9 @@ const ManageProductsPanel = ({ products, setProducts, setIsLoading } : Inventory
                       editFormData.id,
                       editFormData.name,
                       editFormData.price,
+                      "", //Just an empty string for the category, backend doesnt need it
+                      editFormData.description,
+                      editFormData.image
                     ),
                   )
                     .then((productEdited) => {

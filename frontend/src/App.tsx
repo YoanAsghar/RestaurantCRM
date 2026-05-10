@@ -84,11 +84,25 @@ const App = () => {
   // Product states and functions
   //
   const [products, setProducts] = useState<Product[]>([]);
+  const [productCategories, setProductCategories] = useState<string[]>([]);
 
   // get all products at the start of the program
   useEffect(() =>{
     ProductServices.getAll().then(setProducts);
   }, [isAuthenticated])
+  
+  // Update the categories everytime a product is addded or eliminated 
+  useEffect(() => {
+    let Categories: string[] = [];
+    products.forEach((element: Product) => {
+      if(Categories.includes(element.category)){
+        return;
+      }
+      Categories.push(element.category);
+    });
+    setProductCategories(Categories);
+    console.log(productCategories);
+  }, [products])
 
 
 
@@ -157,7 +171,7 @@ const App = () => {
           {/* Admin tab*/}
           <div className={`tab-pane ${currentTab === BodyTabs.admin ? "active" : ""}`}>
             <div className="tab-content-wrapper w-full h-full">
-              <AdminPanel products={products} setProducts={setProducts} setIsLoading={setIsLoading}/>
+              <AdminPanel products={products} setProducts={setProducts} setIsLoading={setIsLoading} productCategories={productCategories}/>
             </div>
           </div>
 

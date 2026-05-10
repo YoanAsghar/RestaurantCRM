@@ -36,11 +36,12 @@ export const ProductServices = {
       body: JSON.stringify(product)
     })
     
-    console.log(product);
+    const data = await response.json();
+    console.log(data);
 
     if(!response.ok) throw  new Error (`Error editing product to ${product.name}`);
 
-  return await response.json();
+  return data;
   },
   
   deleteProduct: async(id: number): Promise<Product> => {
