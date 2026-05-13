@@ -12,13 +12,6 @@ const TableCards = ({table, setSelectedTable, selectedTable}: TableCardProps) =>
   const productsTotal = table.order?.orderDetail?.reduce((sum, item) => sum + ((item.product?.price || 0) * item.quantity), 0) || 0;
   const tip = table.order?.tip || 0;
   const totalPrice = productsTotal + tip;
-  const isActive = isTableActive(table);
-  
-  function isTableActive(tableToCheck: Table): boolean{
-    if(!tableToCheck.order) return false;
-    if(!tableToCheck.order.orderDetail) return false;
-    return tableToCheck.order.orderDetail.length > 0;
-  }
 
   return (
     <div
@@ -28,15 +21,17 @@ const TableCards = ({table, setSelectedTable, selectedTable}: TableCardProps) =>
       {/*<img className="rounded-t-2xl" src="/tables_image.png" alt="" />*/}
       <div className="flex flex-row space-betwen items-center relative">
         <h3 className="text-white p-4 pb-1">{`Mesa ${table.id}`}</h3>
-        {isActive === true ? (
-        <h3 className="text-green-500 bg-green-800 right-4 absolute border-1 rounded-lg text-xs flex items-center w-15 h-5 justify-center">
-          Activa
-        </h3>
-        ):(
-        <h3 className="text-red-500 bg-red-800 right-4 absolute border-1 rounded-lg text-xs flex items-center w-15 h-5 justify-center">
-          Inactiva
-        </h3>
-        )}
+        {(!table.order || table.order.orderDetail.length === 0) 
+          ? 
+          <h3 className="text-red-500 bg-red-800 right-4 absolute border-1 rounded-lg text-xs flex items-center w-15 h-5 justify-center">
+            Inactiva
+          </h3>
+          :
+          <h3 className="text-green-500 bg-green-800 right-4 absolute border-1 rounded-lg text-xs flex items-center w-15 h-5 justify-center">
+            Activa
+          </h3>
+
+        }
       </div>
       <div className="flex flex-row items-center">
         <img

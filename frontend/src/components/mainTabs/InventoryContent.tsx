@@ -1,28 +1,27 @@
 import { useState, useMemo } from "react";
 import { colorPalette } from "../../colorPallete";
 import { Product } from "../../models/product";
-import { ProductServices } from "../../services/ProductServices";
 import ProductCards from "../ProductCards";
 
 interface InventoryContentPromps {
   products: Product[];
-  setProducts: (product: Product[]) => void;
-  setIsLoading: (isLoading: boolean) => void;
+  productCategories: string[];
 }
 
-const InventoryContent = ({ products, setProducts, setIsLoading } : InventoryContentPromps) => {
+const InventoryContent = ({ products, productCategories } : InventoryContentPromps) => {
   //Searchbar status
   const [searchQuery, setSearchQuery] = useState("");
-  
+
   //Current category tab
   const [currentCategoryTab, setCurrentCategoryTab] = useState<string>("");
 
   const filteredProducts = useMemo(() => {
-    if (!searchQuery.trim()) return products;
-    return products.filter(p => 
-      p.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [products, searchQuery]);
+    return products.filter(p => {
+      const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = currentCategoryTab === "" || p.category === currentCategoryTab;
+      return matchesSearch && matchesCategory;
+    });
+  }, [products, searchQuery, currentCategoryTab]);
 
 
   return (
@@ -30,9 +29,9 @@ const InventoryContent = ({ products, setProducts, setIsLoading } : InventoryCon
       className="h-full w-full overflow-auto"
       style={{ backgroundColor: colorPalette.DeepTwilight }}
     >
-      <div className="-8">
+      <div className="p-0">
         <div
-          className="flex flex-col w-screen"
+          className="flex flex-col w-full"
           style={{ backgroundColor: colorPalette.Navy }}
         >
           <div className="mb-4 h-12 relative flex flex-column m-8">
@@ -50,27 +49,40 @@ const InventoryContent = ({ products, setProducts, setIsLoading } : InventoryCon
               style={{ backgroundColor: colorPalette.Charcoal }}
             />
           </div>
+          
 
-          <div
-            className="flex flex-row ml-8 mb-4
-          "
-          >
+          <div className="flex flex-row ml-8 mb-4 flex-wrap">
             <button
-              className="font-bold bg-white m-2 rounded rounded-lg text-white hover:invert p-3 transition-transform duration-300 cursor-pointer hover:scale-90"
-              style={{ backgroundColor: colorPalette.Charcoal }}
+              onClick={() => setCurrentCategoryTab("")}
+              className={`font-bold m-2 rounded-lg p-3 transition-all duration-300 cursor-pointer hover:scale-90 ${currentCategoryTab === "" ? "bg-white text-black" : "text-white"}`}
+              style={{
+                backgroundColor:
+                  currentCategoryTab === ""
+                    ? colorPalette.White
+                    : colorPalette.Charcoal,
+              }}
             >
-              Hamburguesas
+              Todas
             </button>
-            <button
-              className="font-bold bg-white m-2 rounded rounded-lg text-white hover:invert p-3 transition-transform duration-300 cursor-pointer hover:scale-90"
-              style={{ backgroundColor: colorPalette.Charcoal }}
-            >
-              Pizzas
-            </button>
+            {productCategories.map((category, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentCategoryTab(category)}
+                className={`font-bold m-2 rounded-lg p-3 transition-all duration-300 cursor-pointer hover:scale-90 ${currentCategoryTab === category ? "bg-white text-black" : "text-white"}`}
+                style={{
+                  backgroundColor:
+                    currentCategoryTab === category
+                      ? colorPalette.White
+                      : colorPalette.Charcoal,
+                }}
+              >
+                {category}
+              </button>
+            ))}
           </div>
         </div>
 
-        <div className="flex flex-wrap">
+        <div className="flex flex-wrap p-4">
           {filteredProducts.map((product) => (
             <ProductCards key={product.id} product={product} />
           ))}

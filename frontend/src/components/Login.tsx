@@ -28,7 +28,6 @@ const Login = ({isAuthenticated, setIsAuthenticated, setIsLoading, setUsername, 
     try{
       let response = await UserServices.logIn(new User(loginUsername, loginPassword));
 
-      console.log(response.role);
       setUsername(response.userName);
       setRole(response.role);
 

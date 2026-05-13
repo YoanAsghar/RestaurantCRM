@@ -37,7 +37,6 @@ export const ProductServices = {
     })
     
     const data = await response.json();
-    console.log(data);
 
     if(!response.ok) throw  new Error (`Error editing product to ${product.name}`);
 

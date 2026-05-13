@@ -105,16 +105,34 @@ namespace RestaurantCRM.Controllers
 
 
         //
-        // PUT FOR THE USERS
+        // Editing user
         //
-        [HttpPut]
-        public async Task<ActionResult<User>> EditUser()
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult<User>> EditUser(int id, User editerUserData)
         {
-            return Ok();
+            var UserToEdit = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            if (UserToEdit == null)
+            {
+                return BadRequest($"User with id {id} not found");
+            }
+
+            UserToEdit.PaymentDate = editerUserData.PaymentDate;
+            UserToEdit.Role = editerUserData.Role;
+            UserToEdit.Salary = editerUserData.Salary;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return Ok(UserToEdit);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         //
-        // Delete for the users
+        // Deleting users
         //
         [HttpDelete("{id:int}")]
         public async Task<ActionResult<User>> DeleteUser(int id)

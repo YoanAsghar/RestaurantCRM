@@ -18,7 +18,7 @@ const Sidebar = () => {
             </p>
           </li>
           <li  className={`cursor-pointer flex flex-row items-center hover:bg-white hover:invert px-3 py-3 rounded-lg cursor-pointer${selectedTab === 1 ? "bg-purple-950" : ""}`}>
-            <img className="size-6" src="/home_icon.png" alt="" />
+            <img className="size-6" src="/person.png" alt="" />
             <p className="pl-3">
               Gestionar empleados
             </p>

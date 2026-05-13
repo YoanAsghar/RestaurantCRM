@@ -21,7 +21,7 @@ const ManageProductsPanel = ({ products, setProducts, setIsLoading, productCateg
 
   // Estados para Editar
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editFormData, setEditFormData] = useState({ id: 0, name: "", price: 0, description: "", image: ""});
+  const [editFormData, setEditFormData] = useState({ id: 0, name: "", price: 0, category: "", description: "", image: ""});
   
   async function HandleImageEditing(event: ChangeEvent<HTMLInputElement>): Promise<void>{
     const file = event.target.files?.[0];
@@ -94,6 +94,7 @@ const ManageProductsPanel = ({ products, setProducts, setIsLoading, productCateg
           <button
             onClick={() => {
               setAddFormData({ name: "", price: 0, category: "", description: "", image: ""});
+              setIsCustomCategory(false);
               setIsAddModalOpen(true);
             }}
             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 cursor-pointer ml-4"
@@ -139,6 +140,12 @@ const ManageProductsPanel = ({ products, setProducts, setIsLoading, productCateg
                     className="text-left py-4 px-6 font-semibold text-sm"
                     style={{ color: colorPalette.White }}
                   >
+                    Categoría
+                  </th>
+                  <th
+                    className="text-left py-4 px-6 font-semibold text-sm"
+                    style={{ color: colorPalette.White }}
+                  >
                     Descripcion
                   </th>
                   <th
@@ -175,6 +182,12 @@ const ManageProductsPanel = ({ products, setProducts, setIsLoading, productCateg
                       ${product.price.toLocaleString()}
                     </td>
                     <td
+                      className="py-5 px-6 text-sm font-medium"
+                      style={{ color: colorPalette.White }}
+                    >
+                      {product.category}
+                    </td>
+                    <td
                       className="py-5 px-6 font-mono text-sm font-semibold over"
                       style={{ color: colorPalette.White }}
                     >
@@ -188,16 +201,18 @@ const ManageProductsPanel = ({ products, setProducts, setIsLoading, productCateg
                               id: product.id,
                               name: product.name,
                               price: product.price,
+                              category: product.category,
                               description: product.description,
                               image: product.image
                             });
                             setIsEditModalOpen(true);
                           }}
-                          className="bg-blue-600 hover:bg-blue-700 p-2 rounded-lg cursor-pointer flex flex-row"
+                          className="text-white p-2 rounded-lg cursor-pointer flex flex-row"
+                          style={{backgroundColor: colorPalette.DeepTwilight}}
                         >
-                          <p className="pr-2">Editar</p>
+                          <p className="pr-2 truncate">Editar</p>
                           <img
-                            className="w-5 h-5"
+                            className="w-5 h-5 invert"
                             src="/edit.png"
                             alt="Editar"
                           />
@@ -217,11 +232,10 @@ const ManageProductsPanel = ({ products, setProducts, setIsLoading, productCateg
                                 setIsLoading(false);
                               });
                           }}
-                          className="bg-red-600 hover:bg-red-700 p-2 rounded-lg cursor-pointer flex flex-row"
+                          className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg cursor-pointer flex flex-row"
                         >
-                          <p className="pr-2">Eliminar</p>
+                          <p className="pr-2 truncate">Eliminar</p>
                           <img
-                            className="w-5 h-5 invert"
                             src="/trash_icon.png"
                             alt="Eliminar"
                           />
@@ -279,6 +293,46 @@ const ManageProductsPanel = ({ products, setProducts, setIsLoading, productCateg
               </div>
               <div>
                 <label className="block text-sm text-gray-400 mb-1">
+                  Categoría
+                </label>
+                <select
+                  value={isCustomCategory ? "Otros" : addFormData.category}
+                  onChange={(e) => {
+                    if (e.target.value === "Otros") {
+                      setIsCustomCategory(true);
+                      setAddFormData({ ...addFormData, category: "" });
+                    } else {
+                      setIsCustomCategory(false);
+                      setAddFormData({ ...addFormData, category: e.target.value });
+                    }
+                  }}
+                  className="w-full bg-black text-white rounded-lg p-3 border border-gray-700 focus:outline-none focus:border-purple-500"
+                >
+                  <option value="" disabled>Seleccione una categoría</option>
+                  {productCategories.map((cat, index) => (
+                    <option key={index} value={cat}>{cat}</option>
+                  ))}
+                  <option value="Otros">Otros</option>
+                </select>
+              </div>
+              {isCustomCategory && (
+                <div>
+                  <label className="block text-sm text-gray-400 mb-1">
+                    Nueva Categoría
+                  </label>
+                  <input
+                    type="text"
+                    value={addFormData.category}
+                    onChange={(e) =>
+                      setAddFormData({ ...addFormData, category: e.target.value })
+                    }
+                    className="w-full bg-black text-white rounded-lg p-3 border border-gray-700 focus:outline-none focus:border-purple-500"
+                    placeholder="Escriba la categoría"
+                  />
+                </div>
+              )}
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">
                   Descripcion
                 </label>
                 <textarea
@@ -294,27 +348,37 @@ const ManageProductsPanel = ({ products, setProducts, setIsLoading, productCateg
                 />
               </div>
             </div>
-            <div className="pt-2">
-              <label className="block text-sm text-gray-400 m-1">
-                Agregar imagen
-              </label>
-              <input
-                onChange={HandleImageAdding}
-                type="file"
-                accept="image/*"
-                className="text-white w-full h-20 flex rounded-lg justify-center items-center cursor-pointer"
-                style={{ backgroundColor: colorPalette.DeepTwilight }}
-              />
+            <div className="pt-4">
+              <div className="flex items-center gap-3 mb-2">
+                <label className="block text-sm text-gray-400">
+                  Agregar imagen
+                </label>
+                <label 
+                  className="w-8 h-8 flex items-center justify-center rounded-full cursor-pointer hover:scale-90 transition-all"
+                  style={{ backgroundColor: colorPalette.DeepTwilight }}
+                >
+                  <input
+                    onChange={HandleImageAdding}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <img src="/AddBox.png" alt="Add" className="w-4 h-4" />
+                </label>
+              </div>
               {addFormData.image && (
-                <>
-                  <label className="block text-sm text-gray-400 m-1">
-                    Previsualizacion
-                  </label>
+                <div className="mt-2 relative group">
                   <img
-                    className="border-2 rounded-lg border-indigo-500 max-h-32 object-contain mx-auto"
+                    className="w-full max-h-48 object-contain rounded-lg border border-indigo-500 bg-black/20"
                     src={addFormData.image}
                   />
-                </>
+                  <button
+                    onClick={() => setAddFormData({ ...addFormData, image: "" })}
+                    className="absolute top-2 right-2 bg-red-600 hover:scale-90 p-1.5 rounded-full cursor-pointer transition-all shadow-lg"
+                  >
+                    <img src="/trash_icon.png" alt="Eliminar" className="w-4 h-4 invert" />
+                  </button>
+                </div>
               )}
             </div>
             <div className="flex gap-3 mt-6">
@@ -331,10 +395,11 @@ const ManageProductsPanel = ({ products, setProducts, setIsLoading, productCateg
                     0,
                     addFormData.name,
                     addFormData.price,
-                    addFormData.category, //The category, the backend doesnt need it so its just an empty string;
+                    addFormData.category,
                     addFormData.description,
                     addFormData.image
                   );
+                  console.log(newProduct);
                   ProductServices.createProduct(newProduct)
                     .then((newProduct) => {
                       setProducts([...products, newProduct]);
@@ -409,27 +474,37 @@ const ManageProductsPanel = ({ products, setProducts, setIsLoading, productCateg
                 />
               </div>
             </div>
-            <div className="pt-2">
-              <label className="block text-sm text-gray-400 m-1">
-                Cambiar imagen
-              </label>
-              <input
-                onChange={HandleImageEditing}
-                type="file"
-                accept="image/*"
-                className="text-white w-full h-20 flex rounded-lg justify-center items-center cursor-pointer"
-                style={{ backgroundColor: colorPalette.DeepTwilight }}
-              />
+            <div className="pt-4">
+              <div className="flex items-center gap-3 mb-2">
+                <label className="block text-sm text-gray-400">
+                  Cambiar imagen
+                </label>
+                <label 
+                  className="w-8 h-8 flex items-center justify-center rounded-full cursor-pointer hover:scale-90 transition-all"
+                  style={{ backgroundColor: colorPalette.DeepTwilight }}
+                >
+                  <input
+                    onChange={HandleImageEditing}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <img src="/AddBox.png" alt="Change" className="w-4 h-4" />
+                </label>
+              </div>
               {editFormData.image && (
-                <>
-                  <label className="block text-sm text-gray-400 m-1">
-                    Previsualizacion
-                  </label>
+                <div className="mt-2 relative group">
                   <img
-                    className="border-2 rounded-lg border-indigo-500 max-h-32 object-contain mx-auto"
+                    className="w-full max-h-48 object-contain rounded-lg border border-indigo-500 bg-black/20"
                     src={editFormData.image}
                   />
-                </>
+                  <button
+                    onClick={() => setEditFormData({ ...editFormData, image: "" })}
+                    className="absolute top-2 right-2 bg-red-600 hover:scale-90 p-1.5 rounded-full cursor-pointer transition-all shadow-lg"
+                  >
+                    <img src="/trash_icon.png" alt="Eliminar" className="w-4 h-4 invert" />
+                  </button>
+                </div>
               )}
             </div>
             <div className="flex gap-3 mt-6">
@@ -447,7 +522,7 @@ const ManageProductsPanel = ({ products, setProducts, setIsLoading, productCateg
                       editFormData.id,
                       editFormData.name,
                       editFormData.price,
-                      "", //Just an empty string for the category, backend doesnt need it
+                      editFormData.category,
                       editFormData.description,
                       editFormData.image
                     ),

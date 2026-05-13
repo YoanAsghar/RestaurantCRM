@@ -93,15 +93,10 @@ const App = () => {
   
   // Update the categories everytime a product is addded or eliminated 
   useEffect(() => {
-    let Categories: string[] = [];
-    products.forEach((element: Product) => {
-      if(Categories.includes(element.category)){
-        return;
-      }
-      Categories.push(element.category);
-    });
-    setProductCategories(Categories);
-    console.log(productCategories);
+    if (!products) return;
+    const categories = [... new Set (products.map(p => p.category).filter(c => c && c.trim() !== ""))]
+    setProductCategories(categories.sort());
+    console.log("Calculated categories:", categories.sort());
   }, [products])
 
 
@@ -164,7 +159,7 @@ const App = () => {
           {/* Tab Inventario */}
           <div className={`tab-pane ${currentTab === BodyTabs.inventario ? "active" : ""}`}>
             <div className="tab-content-wrapper w-full h-full">
-              <InventoryContent products={products} setProducts={setProducts} setIsLoading={setIsLoading}/>
+              <InventoryContent products={products} setProducts={setProducts} setIsLoading={setIsLoading} productCategories={productCategories}/>
             </div>
           </div>
 
