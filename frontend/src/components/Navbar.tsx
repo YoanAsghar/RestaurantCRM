@@ -6,10 +6,18 @@ interface SideBarProps {
   setTabChange: (tab: BodyTabs) => void;
   currentTab: BodyTabs;
   setIsAuthenticated: (isAuthenticated: boolean) => void;
+  setUsername: (name: string) => void;
+  setRole: (role: string) => void;
 }
 
-const Sidebar = ({username, setTabChange, currentTab, setIsAuthenticated} : SideBarProps) => {
+const Navbar = ({username, setTabChange, setIsAuthenticated, setUsername, setRole} : SideBarProps) => {
   const [selectedTab, setSelectedTab] = useState(1);
+
+  function handleLogout(){
+    setIsAuthenticated(false);
+    setUsername("");
+    setRole("");
+  }
 
   return (
     <nav
@@ -27,7 +35,7 @@ const Sidebar = ({username, setTabChange, currentTab, setIsAuthenticated} : Side
               setTabChange(BodyTabs.mesas);
               setSelectedTab(1);
             }}
-            className={`flex flex-row items-center hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 1 ? "bg-black invert" : ""}`}
+            className={`flex flex-row items-center transition-transform hover:scale-110 hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 1 ? "bg-black invert scale-90" : ""}`}
           >
             <img className="size-6 invert" src="/home_icon.png" alt="" />
             <a href="#" className="flex items-center gap-2 px-4 text-white">
@@ -36,10 +44,23 @@ const Sidebar = ({username, setTabChange, currentTab, setIsAuthenticated} : Side
           </li>
           <li
             onClick={() => {
+              setTabChange(BodyTabs.inventario);
+              setSelectedTab(3);
+            }}className={`flex flex-row items-center transition-transform hover:scale-110 hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 3 ? "bg-black invert scale-90" : ""}`}
+          >
+            <img className="size-6 invert" src="/food.png" alt="" />
+              <a
+                href="#"
+                className="flex items-center gap-2 px-4 text-white"
+              >
+                Carta
+              </a>
+          </li>
+          <li
+            onClick={() => {
               setTabChange(BodyTabs.ordenes);
               setSelectedTab(2);
-            }}
-            className={`flex flex-row items-center hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 2 ? "bg-black invert" : ""}`}
+            }}className={`flex flex-row items-center transition-transform hover:scale-110 hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 2 ? "bg-black invert scale-90" : ""}`}
           >
             <img className="size-6 invert" src="/orders.png" alt="" />
               <a
@@ -51,25 +72,9 @@ const Sidebar = ({username, setTabChange, currentTab, setIsAuthenticated} : Side
           </li>
           <li
             onClick={() => {
-              setTabChange(BodyTabs.inventario);
-              setSelectedTab(3);
-            }}
-            className={`flex flex-row items-center hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 3 ? "bg-black invert" : ""}`}
-          >
-            <img className="size-6 invert" src="/inventory.png" alt="" />
-              <a
-                href="#"
-                className="flex items-center gap-2 px-4 text-white"
-              >
-                Inventario
-              </a>
-          </li>
-          <li
-            onClick={() => {
               setTabChange(BodyTabs.admin);
               setSelectedTab(4);
-            }}
-            className={`flex flex-row items-center hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 4 ? "bg-black invert" : ""}`}
+            }}className={`flex flex-row items-center transition-transform hover:scale-110 hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 4 ? "bg-black invert scale-90" : ""}`}
           >
             <img className="size-6 invert" src="/admin.png" alt="" />
               <a
@@ -84,7 +89,7 @@ const Sidebar = ({username, setTabChange, currentTab, setIsAuthenticated} : Side
 
       {/* Footer */}
       <div className="flex flex-row">
-        <div onClick={() => setIsAuthenticated(false)} className="px-3 flex flex-row items-center cursor-pointer py-3 rounded-lg hover:bg-black hover:invert">
+        <div onClick={handleLogout} className="px-3 flex flex-row items-center cursor-pointer py-3 rounded-lg hover:bg-black hover:invert">
           <p className="text-sm px-4 text-white">{username.toUpperCase()}</p>
           <img src="/logout.png" alt="Cerrar sesion" className="size-6 invert" />
         </div>
@@ -93,5 +98,5 @@ const Sidebar = ({username, setTabChange, currentTab, setIsAuthenticated} : Side
   );
 };
 
-export default Sidebar;
+export default Navbar;
 

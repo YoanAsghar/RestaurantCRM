@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { config } from "../config";
 import { UserServices } from "../services/UserServices";
 import { User } from "../models/user";
 
@@ -9,9 +8,10 @@ interface LoginProps {
   setIsLoading: (isLoading: boolean) => void;
   setUsername: (name: string) => void;
   setRole: (name: string) => void;
+  role: string;
 };
 
-const Login = ({isAuthenticated, setIsAuthenticated, setIsLoading, setUsername, setRole}: LoginProps) => {
+const Login = ({isAuthenticated, setIsAuthenticated, setIsLoading, setUsername, setRole, role}: LoginProps) => {
   const [loginUsername, setLoginUsername] = useState<string>("");
   const [loginPassword, setLoginPassword] = useState<string>("");
 
@@ -28,7 +28,6 @@ const Login = ({isAuthenticated, setIsAuthenticated, setIsLoading, setUsername, 
     try{
       let response = await UserServices.logIn(new User(loginUsername, loginPassword));
 
-      console.log(response);
       setUsername(response.userName);
       setRole(response.role);
 

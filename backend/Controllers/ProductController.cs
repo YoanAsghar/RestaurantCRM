@@ -65,6 +65,8 @@ public class ProductController : ControllerBase
 
         ProductToEdit.Name = newProductData.Name;
         ProductToEdit.Price = newProductData.Price;
+        ProductToEdit.Description = newProductData.Description;
+        ProductToEdit.Image = newProductData.Image;
 
         try
         {
