@@ -3,7 +3,8 @@ import { OrderServices } from "./services/OrderServices";
 import { useEffect, useState } from "react";
 import Navbar from "./components/Navbar";
 import { Table } from "./models/table";
-import InventoryContent from "./components/mainTabs/InventoryContent";
+import MenuContent from "./components/mainTabs/MenuContent";
+import InventoryContent from "./components/mainTabs/MenuContent";
 import { OrdersContent } from "./components/mainTabs/OrdersContent";
 import TablesContent from "./components/mainTabs/TablesContent";
 import TableInformation from "./components/mainTabs/tableInformation";
@@ -14,9 +15,11 @@ import { ProductServices } from "./services/ProductServices";
 import type { Order } from "./models/order";
 import AdminPanel from "./components/AdminTabs/AdminPanel";
 import Login from "./components/Login";
+import KitchenView from "./components/mainTabs/KitchenView";
 
 enum BodyTabs {
   mesas = "mesas",
+  cocina = "cocina",
   ordenes = "ordenes",
   inventario = "inventario",
   domicilios = "domicilios",
@@ -105,20 +108,17 @@ const App = () => {
   // Order states and functions
   //
   const [orders, setOrders] = useState<Order[]>([]);
-  const [ordersSectionPage, setOrdersSectionPage] = useState(1);
+  const [ordersDateQuery, setOrdersDateQuery] = useState<string>(new Date().toISOString().split("T")[0]);
 
   //get all orders when page first loads
   useEffect(() => {
-    OrderServices.getAll(ordersSectionPage).then(setOrders).then;
+    OrderServices.getAll(ordersDateQuery).then(setOrders);
   }, [isAuthenticated]);
 
   // get all orders when changing tabs
   useEffect(() => {
-    setIsLoading(true);
-    OrderServices.getAll(ordersSectionPage).then(setOrders);
-    setIsLoading(false);
-  }, [currentTab, ordersSectionPage]);
-
+      OrderServices.getAll(ordersDateQuery).then(setOrders);
+  }, [ordersDateQuery]);
 
   //
   // Other states and functions
@@ -152,14 +152,21 @@ const App = () => {
           {/* Tab Ordenes */}
           <div className={`tab-pane ${currentTab === BodyTabs.ordenes ? "active" : ""}`}>
             <div className="tab-content-wrapper w-full h-full">
-              <OrdersContent orders={orders} setPage={setOrdersSectionPage} page={ordersSectionPage} />
+              <OrdersContent orders={orders} setOrdersDateQuery={setOrdersDateQuery} orderDatesQuery={ordersDateQuery}/>
             </div>
           </div>
 
-          {/* Tab Inventario */}
+          {/* Tab cocina */}
+          <div className={`tab-pane ${currentTab === BodyTabs.cocina ? "active" : ""}`}>
+            <div className="tab-content-wrapper w-full h-full">
+              <KitchenView/>
+            </div>
+          </div>
+
+          {/* Tab Menu */}
           <div className={`tab-pane ${currentTab === BodyTabs.inventario ? "active" : ""}`}>
             <div className="tab-content-wrapper w-full h-full">
-              <InventoryContent products={products} setProducts={setProducts} setIsLoading={setIsLoading} productCategories={productCategories}/>
+              <MenuContent products={products} productCategories={productCategories}/>
             </div>
           </div>
 

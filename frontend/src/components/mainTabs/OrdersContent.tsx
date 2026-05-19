@@ -1,4 +1,6 @@
+import React, { useEffect, useState, type ReactEventHandler } from "react";
 import { Order } from "../../models/order";
+import { OrderServices } from "../../services/OrderServices";
 
 const colorPalette = {
   DeepTwilight: "#140152",
@@ -9,13 +11,15 @@ const colorPalette = {
 
 interface ordersContentProps {
   orders: Order[];
-  page: number;
-  setPage: (page: number) => void;
+  setOrdersDateQuery: (date: string) => void;
+  orderDatesQuery: string;
 }
 
-export const OrdersContent = ({orders, page, setPage} : ordersContentProps) => {
+export const OrdersContent = ({orders, setOrdersDateQuery, orderDatesQuery} : ordersContentProps) => {
 
-
+  function handleDateChange(e: React.ChangeEvent<HTMLInputElement>){
+    setOrdersDateQuery(e.target.value);
+  }
   const totalGeneral = orders.reduce((sum, order) => sum + order.totalPrice, 0);
 
   return (
@@ -28,22 +32,11 @@ export const OrdersContent = ({orders, page, setPage} : ordersContentProps) => {
           className="rounded-xl overflow-hidden shadow-2xl"
           style={{ backgroundColor: colorPalette.Charcoal }}
         >
-          <div className="py-4 flex flex-row justify-between items-center w-full px-8" style={{backgroundColor: colorPalette.DeepTwilight}}>
-            <button 
-              onClick={() => setPage(Math.max(1, page - 1))}
-              className="w-14 h-14 flex items-center justify-center rounded-xl cursor-pointer transition-all hover:bg-white/20 bg-zinc-950 text-white text-2xl font-bold"
-            >
-              {"<"}
-            </button>
+          <div className="py-4 flex flex-row items-center w-full px-8" style={{backgroundColor: colorPalette.DeepTwilight}}>
 
-            <p className="text-white font-bold text-xl uppercase tracking-widest">{`Página ${page}`}</p>
+            <p className="border-0 text-white font-bold text-xl uppercase tracking-widest mr-5">Ordenes de: </p>
+            <input onChange={handleDateChange} className="border-0 cursor-pointer text-white font-bold text-xl uppercase tracking-widest" type="date" value={orderDatesQuery} />
 
-            <button 
-              onClick={() => setPage(page + 1)}
-              className="w-14 h-14 flex items-center justify-center rounded-xl cursor-pointer transition-all hover:bg-white/20 bg-zinc-950 text-white text-2xl font-bold"
-            >
-              {">"}
-            </button>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
