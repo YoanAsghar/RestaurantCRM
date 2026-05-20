@@ -3,14 +3,15 @@ import { Product } from "../models/product"
 
 interface ProductCardsProps {
   product: Product;
+  showImages: boolean;
 }
 
-const ProductCards = ({product} :ProductCardsProps)  => {
+const ProductCards = ({product, showImages} :ProductCardsProps)  => {
   return (
     <div
       className="rounded-xl w-70 flex flex-col m-2 shadow-lg transition-transform bg-[#1b1b1c]"
     >
-     {/*
+      {showImages && (
         <div className="h-40 w-full">
           <img 
             className="w-full h-full object-cover" 
@@ -18,7 +19,7 @@ const ProductCards = ({product} :ProductCardsProps)  => {
             alt={product.name} 
           />
         </div>
-      */} 
+      )}
       <div className="flex flex-row items-center p-5 min-h-20">
         <div className="flex flex-col w-full">
           <h2 className="mt-1 mb-1 text-xs rounded-lg p-2 w-fit " style={{backgroundColor: colorPalette.DeepTwilight}}>{product.category}</h2>

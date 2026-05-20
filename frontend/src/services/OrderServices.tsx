@@ -4,8 +4,8 @@ import type { Order } from "../models/order";
 const API_URL = `${config.apiRoute}/api/v1/Order`
 
 export const OrderServices = {
-  getAll: async (page : number = 1): Promise<Order[]> => {
-    const response = await fetch(API_URL + `?pageSize=20&page=${page}`);
+  getAll: async (dateQuery: string): Promise<Order[]> => {
+    const response = await fetch(API_URL + `?date=${dateQuery}`);
     if(!response.ok) throw new Error ("Error fetching orders")
 
     return await response.json();

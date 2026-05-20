@@ -1,5 +1,3 @@
-import ManageProductsPanel from "./ManageProductsPanel"
-import Sidebar from "./Sidebar"
 import { Product } from "../../models/product";
 
 interface InventoryContentPromps {
@@ -9,11 +7,9 @@ interface InventoryContentPromps {
   productCategories: string[];
 }
 
-const AdminPanel = ({products, setProducts, setIsLoading, productCategories}: InventoryContentPromps) => {
+const AdminPanel = () => {
   return (
     <div className="flex flex-row">
-      <Sidebar/>
-      <ManageProductsPanel setProducts={setProducts} products={products} setIsLoading={setIsLoading} productCategories={productCategories}/>
     </div>
   )
 }

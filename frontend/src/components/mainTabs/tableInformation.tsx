@@ -13,7 +13,7 @@ interface TableInformationProps{
   products: Product[];
 }
 
-const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: TableInformationProps) => {
+const TableInformation = ({table, onUpdateTable, setIsLoading, products }: TableInformationProps) => {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.CASH);
   const [amountOfPersons, setAmountOfPersons] = useState(table?.order?.guests || 0);
   const [propina, setPropina] = useState(table?.order?.tip || 0);
@@ -83,6 +83,7 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: Tabl
   }
 
   function removeProductFromTable(index: number){
+
     const detail = currentProducts[index];
     let newDetails: orderDetail[];
 
@@ -134,7 +135,6 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: Tabl
       ...table,
       order: finalOrder
     });
-    resetTableData();
   }
 
   return (
@@ -302,7 +302,7 @@ const TableInformation = ({ table, onUpdateTable, setIsLoading, products }: Tabl
         </div>
         <button 
           onClick={handleProcessPayment} 
-          className="cursor-pointer w-full bg-purple-600 hover:bg-purple-700 h-14 rounded-2xl text-white font-bold text-xl transition-colors"
+          className="cursor-pointer w-full bg-[#04052e] hover:invert h-14 rounded-2xl text-white font-bold text-xl transition-colors"
         >
           Procesar pago
         </button>

@@ -16,19 +16,50 @@ public class OrderController : ControllerBase
         _context = context;
     }
     //
-    // GET FOR THE ORDERS
+    // GET FOR THE ORDERS BY ID PAGE AND SIZE
     //
     [HttpGet]
-    public async Task<ActionResult<List<Order>>> GetOrders([FromQuery] int pageSize, [FromQuery] int page)
+    public async Task<ActionResult<List<Order>>> GetOrders([FromQuery] DateOnly? date)
     {
+        var filterDate = date ?? DateOnly.FromDateTime(DateTime.UtcNow);
+
+        var startDay = filterDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+        var endDay = startDay.AddDays(1);
+
         var orders = await _context.Orders
-          .Include(o => o.OrderDetail)
-          .ThenInclude(od => od.Product)
-          .OrderByDescending(o => o.Id)
-          .Skip((page - 1) * pageSize)
-          .Take(pageSize)
-          .OrderBy(o => o.Id)
-          .ToListAsync();
+                  .Where(o => o.OrderDate >= startDay && o.OrderDate < endDay)
+                  .AsNoTracking()
+                  .Include(o => o.OrderDetail)
+                  .ThenInclude(od => od.Product)
+                  .Select(o => new Order
+                  {
+                      Id = o.Id,
+                      TotalPrice = o.TotalPrice,
+                      OrderDate = o.OrderDate,
+                      Guests = o.Guests,
+                      Tip = o.Tip,
+                      PaymentMethod = o.PaymentMethod,
+                      TableId = o.TableId,
+                      OrderDetail = o.OrderDetail.Select(od => new OrderDetail
+                      {
+                          Id = od.Id,
+                          OrderId = od.OrderId,
+                          ProductId = od.ProductId,
+                          Product = new Product
+                          {
+                              Id = od.Product!.Id,
+                              Name = od.Product.Name,
+                              Price = od.Product.Price,
+                              Category = od.Product.Category,
+                              Description = od.Product.Description,
+                              Image = null
+                          },
+                          Quantity = od.Quantity
+                      }).ToList()
+                  })
+                  .OrderByDescending(o => o.Id)
+                  .ToListAsync();
+
         return Ok(orders);
     }
 
