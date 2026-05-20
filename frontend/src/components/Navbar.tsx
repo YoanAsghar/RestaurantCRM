@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BodyTabs } from "../colorPallete";
+import { BodyTabs } from "../App";
 
 interface SideBarProps {
   username: string;
@@ -8,9 +8,10 @@ interface SideBarProps {
   setIsAuthenticated: (isAuthenticated: boolean) => void;
   setUsername: (name: string) => void;
   setRole: (role: string) => void;
+  role: string;
 }
 
-const Navbar = ({username, setTabChange, setIsAuthenticated, setUsername, setRole} : SideBarProps) => {
+const Navbar = ({role, username, setTabChange, setIsAuthenticated, setUsername, setRole} : SideBarProps) => {
   const [selectedTab, setSelectedTab] = useState(1);
 
   function handleLogout(){
@@ -58,53 +59,58 @@ const Navbar = ({username, setTabChange, setIsAuthenticated, setUsername, setRol
             onClick={() => {
               setTabChange(BodyTabs.inventario);
               setSelectedTab(3);
-            }}className={`flex flex-row items-center transition-transform hover:scale-110 hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 3 ? "bg-black invert scale-90" : ""}`}
+            }}
+            className={`flex flex-row items-center transition-transform hover:scale-110 hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 3 ? "bg-black invert scale-90" : ""}`}
           >
             <img className="size-6 invert" src="/food.png" alt="" />
-              <a
-                href="#"
-                className="flex items-center gap-2 px-4 text-white"
-              >
-                Carta
-              </a>
+            <a href="#" className="flex items-center gap-2 px-4 text-white">
+              Carta
+            </a>
           </li>
           <li
             onClick={() => {
               setTabChange(BodyTabs.ordenes);
               setSelectedTab(4);
-            }}className={`flex flex-row items-center transition-transform hover:scale-110 hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 4 ? "bg-black invert scale-90" : ""}`}
+            }}
+            className={`flex flex-row items-center transition-transform hover:scale-110 hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 4 ? "bg-black invert scale-90" : ""}`}
           >
             <img className="size-6 invert" src="/orders.png" alt="" />
-              <a
-                href="#"
-                className="flex items-center gap-2 px-4 text-white "
-              >
-                Ordenes
-              </a>
+            <a href="#" className="flex items-center gap-2 px-4 text-white ">
+              Ordenes
+            </a>
           </li>
+          {role === "admin" ? (
           <li
             onClick={() => {
               setTabChange(BodyTabs.admin);
               setSelectedTab(5);
-            }}className={`flex flex-row items-center transition-transform hover:scale-110 hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 5 ? "bg-black invert scale-90" : ""}`}
+            }}
+            className={`flex flex-row items-center transition-transform hover:scale-110 hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 5 ? "bg-black invert scale-90" : ""}`}
           >
             <img className="size-6 invert" src="/admin.png" alt="" />
-              <a
-                href="#"
-                className="flex items-center gap-2 px-4 text-white"
-              >
-                Admin
-              </a>
+            <a href="#" className="flex items-center gap-2 px-4 text-white">
+              Admin
+            </a>
           </li>
+          ):(
+            <></>
+          )}
         </ul>
       </nav>
 
       {/* Footer */}
       <div className="flex flex-row">
-        <div onClick={handleLogout} className="px-3 flex flex-row items-center cursor-pointer py-3 rounded-lg hover:bg-black hover:invert">
+        <button
+          onClick={handleLogout}
+          className="px-3 flex flex-row items-center cursor-pointer py-3 rounded-lg hover:bg-black hover:invert"
+        >
           <p className="text-sm px-4 text-white">{username.toUpperCase()}</p>
-          <img src="/logout.png" alt="Cerrar sesion" className="size-6 invert" />
-        </div>
+          <img
+            src="/logout.png"
+            alt="Cerrar sesion"
+            className="size-6 invert"
+          />
+        </button>
       </div>
     </nav>
   );
