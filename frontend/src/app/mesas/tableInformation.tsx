@@ -135,6 +135,7 @@ const TableInformation = ({table, onUpdateTable, setIsLoading, products }: Table
       ...table,
       order: finalOrder
     });
+    resetTableData();
   }
 
   return (
@@ -302,7 +303,7 @@ const TableInformation = ({table, onUpdateTable, setIsLoading, products }: Table
         </div>
         <button 
           onClick={handleProcessPayment} 
-          className="cursor-pointer w-full bg-[#04052e] hover:invert h-14 rounded-2xl text-white font-bold text-xl transition-colors"
+          className="cursor-pointer w-full bg-[#22007c] hover:bg-[#140152] h-14 rounded-2xl text-white font-bold text-xl transition-colors"
         >
           Procesar pago
         </button>
@@ -316,7 +317,7 @@ const PaymentButton = ({ active, onClick, icon, label }: any) => (
     onClick={onClick}
     className={`flex flex-col items-center justify-center p-3 rounded-2xl cursor-pointer transition-all
 ${active 
-? "bg-purple-950 scale-105" 
+? "bg-[#22007c] scale-105" 
 : "bg-zinc-900 hover:bg-zinc-800"}`}
   >
     <img className="w-8 h-8 mb-1" src={icon} alt={label} />

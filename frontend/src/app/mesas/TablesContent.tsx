@@ -1,5 +1,5 @@
 import { colorPalette} from "../../colorPallete"
-import TableCards from "../TableCards"
+import TableCards from "../../components/TableCards";
 import { Table } from "../../models/table";
 
 interface TableContentPrompts{

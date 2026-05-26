@@ -43,7 +43,6 @@ export const OrderServices = {
     }
     
     if(!response.ok) {
-      console.error("Error creating order (Raw):", data);
       throw new Error(typeof data === 'string' ? data : (data.title || "Problem creating order"));
     }
 

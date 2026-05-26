@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { BodyTabs } from "../App";
+import { BodyTabs } from "../models/BodyTabs";
+import { useRouter } from "next/navigation";
 
 interface SideBarProps {
   username: string;
@@ -13,11 +14,13 @@ interface SideBarProps {
 
 const Navbar = ({role, username, setTabChange, setIsAuthenticated, setUsername, setRole} : SideBarProps) => {
   const [selectedTab, setSelectedTab] = useState(1);
+  const router = useRouter();
 
   function handleLogout(){
     setIsAuthenticated(false);
     setUsername("");
     setRole("");
+    router.push("/");
   }
 
   return (

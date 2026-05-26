@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using RestaurantCRM.Models;
 using RestaurantCRM.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.SignalR;
+using RestaurantCRM.Hubs;
 
 namespace RestaurantCRM.Controllers;
 
@@ -10,10 +12,12 @@ namespace RestaurantCRM.Controllers;
 public class TableController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
+    private readonly IHubContext<TablesHub> _hubContext;
 
-    public TableController(ApplicationDbContext context)
+    public TableController(ApplicationDbContext context, IHubContext<TablesHub> hubContext)
     {
         _context = context;
+        _hubContext = hubContext;
     }
     //
     // GET FOR THE ORDERS
