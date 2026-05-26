@@ -26,7 +26,8 @@ export const UserServices = {
       return await response.json();
     }
     else{
-      return await response.json();
+      const errorText = await response.text();
+      throw new Error(errorText || "Unauthorized");
     }
   },
 

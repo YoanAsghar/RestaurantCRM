@@ -406,3 +406,5 @@ FodyWeavers.xsd
 appsettings.Development.json
 .env.
 z.txt
+
+.next

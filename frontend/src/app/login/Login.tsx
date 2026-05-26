@@ -1,6 +1,6 @@
+import { UserServices } from "@/services/UserServices";
+import { User } from "@/models/user";
 import React, { useState } from "react";
-import { UserServices } from "../services/UserServices";
-import { User } from "../models/user";
 
 interface LoginProps {
   isAuthenticated: boolean;
@@ -27,13 +27,12 @@ const Login = ({isAuthenticated, setIsAuthenticated, setIsLoading, setUsername, 
     setIsLoading(true);
     try{
       let response = await UserServices.logIn(new User(loginUsername, loginPassword));
-
+      
       setUsername(response.userName);
       setRole(response.role);
-
       setIsAuthenticated(true);
     }catch(error){
-      throw new Error("Invalid credentials");
+      // Silently handle or show a proper UI error message
     }
     finally{
       setIsLoading(false);
@@ -42,7 +41,7 @@ const Login = ({isAuthenticated, setIsAuthenticated, setIsLoading, setUsername, 
 
   return (
     <div
-      className={`min-h-screen w-full flex items-center justify-center bg-primary p-4 relative overflow-hidden ${isAuthenticated === false ? "" : "hidden"}`}
+      className={`min-h-screen w-full flex items-center justify-center bg-primary p-4 relative overflow-hidden`}
     >
       {/* Background radial glows for atmosphere */}
       <div className="absolute inset-0 z-0">
@@ -81,9 +80,10 @@ const Login = ({isAuthenticated, setIsAuthenticated, setIsLoading, setUsername, 
               </div>
               <input
                 type="text"
+                value={loginUsername}
                 className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-[#22007c] focus:bg-white/10 transition-all"
                 placeholder="Nombre de usuario"
-                onChange={handleUsernameChange}
+                onChange={(e) => setLoginUsername(e.target.value)}
               />
             </div>
           </div>
@@ -112,9 +112,10 @@ const Login = ({isAuthenticated, setIsAuthenticated, setIsLoading, setUsername, 
               </div>
               <input
                 type="password"
+                value={loginPassword}
                 className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-[#22007c] focus:bg-white/10 transition-all"
                 placeholder="••••••••"
-                onChange={handlePasswordChange}
+                onChange={(e) => setLoginPassword(e.target.value)}
               />
             </div>
           </div>
