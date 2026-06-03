@@ -15,14 +15,6 @@ const Login = ({isAuthenticated, setIsAuthenticated, setIsLoading, setUsername, 
   const [loginUsername, setLoginUsername] = useState<string>("");
   const [loginPassword, setLoginPassword] = useState<string>("");
 
-  function handleUsernameChange(e: React.ChangeEvent<HTMLInputElement>): void {
-    setLoginUsername(e.target.value);
-  }
-
-  function handlePasswordChange(e: React.ChangeEvent<HTMLInputElement>): void {
-    setLoginPassword(e.target.value);
-  }
-
   async function handleLoginButton(): Promise<void>{
     setIsLoading(true);
     try{
@@ -137,5 +129,6 @@ const Login = ({isAuthenticated, setIsAuthenticated, setIsLoading, setUsername, 
     </div>
   );
 };
+  
 
 export default Login;

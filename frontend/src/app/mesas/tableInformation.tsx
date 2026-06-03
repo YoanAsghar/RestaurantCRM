@@ -263,7 +263,7 @@ const TableInformation = ({table, onUpdateTable, setIsLoading, products }: Table
             </div>
             <ul className="flex-1 flex flex-col w-full overflow-y-auto px-4 gap-2 pb-4">
               {filteredProducts.map((product) => (
-                <li key={product.id + Math.random()} className="flex flex-row justify-between items-center rounded-lg text-black p-3 bg-white shadow-sm hover:bg-gray-50 transition-colors">
+                <li key={product.id} className="flex flex-row justify-between items-center rounded-lg text-black p-3 bg-white shadow-sm hover:bg-gray-50 transition-colors">
                   <div className="flex flex-col">
                     <p className="font-bold text-lg leading-tight">{product.name}</p>
                     <p className="text-sm opacity-60 font-medium">${product.price}</p>

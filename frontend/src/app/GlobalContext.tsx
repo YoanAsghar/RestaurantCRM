@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useMemo } from 'react';
 
 interface GlobalContextType {
   isAuthenticated: boolean;
@@ -21,19 +21,19 @@ export function GlobalProvider({ children }: { children: React.ReactNode }) {
   const [role, setRole] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const value = useMemo(() => ({
+    isAuthenticated,
+    setIsAuthenticated,
+    username,
+    setUsername,
+    role,
+    setRole,
+    isLoading,
+    setIsLoading,
+  }), [isAuthenticated, username, role, isLoading]);
+
   return (
-    <GlobalContext.Provider
-      value={{
-        isAuthenticated,
-        setIsAuthenticated,
-        username,
-        setUsername,
-        role,
-        setRole,
-        isLoading,
-        setIsLoading,
-      }}
-    >
+    <GlobalContext.Provider value={value}>
       {children}
     </GlobalContext.Provider>
   );

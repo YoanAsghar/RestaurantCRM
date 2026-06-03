@@ -42,7 +42,7 @@ export default function RootClientLayout({
     return BodyTabs.mesas;
   };
 
-  const currentTab = getTabFromPathname(pathname);
+  const currentTab = getTabFromPathname(pathname || "");
 
   const handleTabChange = (tab: BodyTabs) => {
     router.push(`/${tab}`);

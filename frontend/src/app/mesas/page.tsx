@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Table } from "../../models/table";
 import { TableServices } from "../../services/TableServices";
 import { Product } from "../../models/product";
@@ -15,8 +15,11 @@ export default function MesasPage() {
   // Table related status and functions
   const [tables, setTables] = useState<Table[]>([]);
   const [currentTableSelectedId, setCurrentTableSelectedId] = useState<number>(1);
-  const [selectedTable, setSelectedTable] = useState<Table>(
-    tables[0] || new Table(1),
+
+  // Derive the selected table from the tables array (memoized to prevent new object references)
+  const selectedTable = useMemo(
+    () => tables.find(t => t.id === currentTableSelectedId) || tables[0] || new Table(currentTableSelectedId),
+    [tables, currentTableSelectedId]
   );
 
   // Retrieve all the created tables
@@ -24,11 +27,15 @@ export default function MesasPage() {
     TableServices.getAll().then(setTables);
   }, [isAuthenticated]);
 
-  const handleUpdateTable = (updatedTable: Table) => {
+  const handleUpdateTable = useCallback((updatedTable: Table) => {
     setTables((prev) =>
       prev.map((t) => (t.id === updatedTable.id ? updatedTable : t)),
     );
-  };
+  }, []);
+
+  const handleSelectTable = useCallback((table: Table) => {
+    setCurrentTableSelectedId(table.id);
+  }, []);
 
   const handleAddTable = async () => {
     setIsLoading(true);
@@ -72,7 +79,7 @@ export default function MesasPage() {
         onAddTable={handleAddTable}
         onRemoveTable={handleRemoveTable}
         role={role}
-        setSelectedTable={setSelectedTable}
+        setSelectedTable={handleSelectTable}
       />
       <TableInformation
         products={products}
