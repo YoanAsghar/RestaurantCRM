@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RestaurantCRM.Data;
@@ -6,6 +7,7 @@ namespace RestaurantCRM.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
+[Authorize]
 public class MaintenanceController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
@@ -15,7 +17,9 @@ public class MaintenanceController : ControllerBase
         _context = context;
     }
 
+    // Destructive operation — restricted to admins.
     [HttpPost("clear-database")]
+    [Authorize(Policy = "AdminOnly")]
     public async Task<IActionResult> ClearDatabase()
     {
         try

@@ -17,7 +17,7 @@ const TableInformation = ({table, onUpdateTable, setIsLoading, products }: Table
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.CASH);
   const [amountOfPersons, setAmountOfPersons] = useState(table?.order?.guests || 0);
   const [propina, setPropina] = useState(table?.order?.tip || 0);
-  const [currentTab, setCurrenTab] = useState(true);
+  const [currentTab, setCurrenTab] = useState(false);
   const [searchBarValue, setSearchBarValue] = useState("");
   const [currentProducts, setCurrentProducts] = useState<orderDetail[]>([]);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -248,11 +248,11 @@ const TableInformation = ({table, onUpdateTable, setIsLoading, products }: Table
               </button>
             </div>
 
-            <div className="relative w-full px-4 mb-4">
+            <div className="relative w-full px-15 mt-3 mb-4">
               <img 
                 src="/search_icon.png" 
                 alt="Buscar" 
-                className="absolute left-7 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none brightness-0"
+                className="absolute left-7 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none brightness-0 invert"
               />
               <input 
                 onChange={(e) => setSearchBarValue(e.target.value.toLowerCase())}
@@ -261,7 +261,7 @@ const TableInformation = ({table, onUpdateTable, setIsLoading, products }: Table
                 className="w-full bg-white text-black rounded-lg p-3 pl-14 border-none focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
-            <ul className="flex-1 flex flex-col w-full overflow-y-auto px-4 gap-2 pb-4">
+            <ul className="flex-1 flex flex-col w-full overflow-y-auto px-15 gap-2 pb-4">
               {filteredProducts.map((product) => (
                 <li key={product.id} className="flex flex-row justify-between items-center rounded-lg text-black p-3 bg-white shadow-sm hover:bg-gray-50 transition-colors">
                   <div className="flex flex-col">

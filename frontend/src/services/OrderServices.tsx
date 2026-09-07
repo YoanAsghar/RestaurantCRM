@@ -5,7 +5,7 @@ const API_URL = `${config.apiRoute}/api/v1/Order`
 
 export const OrderServices = {
   getAll: async (dateQuery: string): Promise<Order[]> => {
-    const response = await fetch(API_URL + `?date=${dateQuery}`);
+    const response = await fetch(API_URL + `?date=${dateQuery}`, { credentials: "include" });
     if(!response.ok) throw new Error ("Error fetching orders")
 
     return await response.json();
@@ -31,6 +31,7 @@ export const OrderServices = {
     const response = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json"},
+      credentials: "include",
       body: JSON.stringify(orderPayload)
     });
 

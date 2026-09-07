@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestaurantCRM.Models;
 using Microsoft.EntityFrameworkCore;
@@ -9,13 +10,14 @@ namespace RestaurantCRM.Controllers;
 
 [Route("api/v1/[controller]")]
 [ApiController]
+[Authorize]
 public class OrderController : ControllerBase
 {
     // database and hub context
     private readonly ApplicationDbContext _context;
-    private readonly IHubContext<OrdersHub> _hubContext;
+    private readonly IHubContext<RestaurantHub> _hubContext;
 
-    public OrderController(ApplicationDbContext context, IHubContext<OrdersHub> hubContext)
+    public OrderController(ApplicationDbContext context, IHubContext<RestaurantHub> hubContext)
     {
         _context = context;
         _hubContext = hubContext;

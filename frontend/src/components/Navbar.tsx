@@ -6,20 +6,16 @@ interface SideBarProps {
   username: string;
   setTabChange: (tab: BodyTabs) => void;
   currentTab: BodyTabs;
-  setIsAuthenticated: (isAuthenticated: boolean) => void;
-  setUsername: (name: string) => void;
-  setRole: (role: string) => void;
   role: string;
+  onLogout: () => void;
 }
 
-const Navbar = ({role, username, setTabChange, setIsAuthenticated, setUsername, setRole} : SideBarProps) => {
+const Navbar = ({role, username, setTabChange, onLogout} : SideBarProps) => {
   const [selectedTab, setSelectedTab] = useState(1);
   const router = useRouter();
 
   function handleLogout(){
-    setIsAuthenticated(false);
-    setUsername("");
-    setRole("");
+    onLogout();
     router.push("/");
   }
 
@@ -60,7 +56,7 @@ const Navbar = ({role, username, setTabChange, setIsAuthenticated, setUsername, 
           </li>
           <li
             onClick={() => {
-              setTabChange(BodyTabs.inventario);
+              setTabChange(BodyTabs.carta);
               setSelectedTab(3);
             }}
             className={`flex flex-row items-center transition-transform hover:scale-110 hover:bg-black hover:invert px-3 py-3 w-40 rounded-lg cursor-pointer ${selectedTab === 3 ? "bg-black invert scale-90" : ""}`}

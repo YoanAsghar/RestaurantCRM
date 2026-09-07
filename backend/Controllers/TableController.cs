@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestaurantCRM.Models;
 using RestaurantCRM.Data;
@@ -9,12 +10,13 @@ namespace RestaurantCRM.Controllers;
 
 [Route("api/v1/[controller]")]
 [ApiController]
+[Authorize]
 public class TableController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
-    private readonly IHubContext<TablesHub> _hubContext;
+    private readonly IHubContext<RestaurantHub> _hubContext;
 
-    public TableController(ApplicationDbContext context, IHubContext<TablesHub> hubContext)
+    public TableController(ApplicationDbContext context, IHubContext<RestaurantHub> hubContext)
     {
         _context = context;
         _hubContext = hubContext;
@@ -34,26 +36,34 @@ public class TableController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> CreateTable(Table table)
     {
+        if (table.TableNumber == null)
+        {
+            return BadRequest("Table number is required");
+        }
+
         _context.Tables.Add(table);
         await _context.SaveChangesAsync();
         return Ok(table);
     }
 
     //
-    // DELETE FOR THE ORDERS 
+    // DELETE FOR THE TABLES
     //
-    [HttpDelete]
-    public async Task<ActionResult> DeleteTable()
+    [HttpDelete("{id:int}")]
+    public async Task<ActionResult> DeleteTable(int id)
     {
-        var TableToDelete = _context.Tables
-          .OrderBy(t => t.Id)
-          .Last();
-        _context.Tables.Remove(TableToDelete);
+        var tableToDelete = await _context.Tables.FirstOrDefaultAsync(t => t.Id == id);
+        if (tableToDelete == null)
+        {
+            return NotFound($"Table with id {id} doesn't exist");
+        }
+
+        _context.Tables.Remove(tableToDelete);
 
         try
         {
             await _context.SaveChangesAsync();
-            return Ok(TableToDelete);
+            return Ok(tableToDelete);
         }
         catch (Exception ex)
         {

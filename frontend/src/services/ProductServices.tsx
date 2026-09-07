@@ -5,14 +5,15 @@ const API_URL = config.apiRoute + "/api/v1/Product"
 
 export const ProductServices = {
   getAll: async(searchTerm : string = ""): Promise<Product[]> =>{
-    //If search term is empty return all products     
+    //If search term is empty return all products
+    const opts: RequestInit = { credentials: "include" };
     if(searchTerm === ""){
-      const response = await fetch(API_URL + "/search");
+      const response = await fetch(API_URL + "/search", opts);
       if(!response.ok) throw new Error ("Error fetching products");
       return await response.json();
     }
 
-    const response = await fetch(API_URL + `/search?search=${searchTerm}`)
+    const response = await fetch(API_URL + `/search?search=${searchTerm}`, opts)
     if(!response.ok) throw new Error (`Error getting ${searchTerm} products`);
     return await response.json();
   },
@@ -21,6 +22,7 @@ export const ProductServices = {
     const response = await fetch(API_URL, {
       method : "POST",
       headers : { "Content-Type": "application/json"},
+      credentials: "include",
       body : JSON.stringify(product)
     })
 
@@ -33,6 +35,7 @@ export const ProductServices = {
     const response = await fetch(API_URL + `/${product.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify(product)
     })
     
@@ -46,7 +49,8 @@ export const ProductServices = {
   deleteProduct: async(id: number): Promise<Product> => {
     const response = await fetch(API_URL + `/${id}`, {
       method: "DELETE",
-      headers: { "Content-Type": "application/json"}
+      headers: { "Content-Type": "application/json"},
+      credentials: "include"
     })
 
     if(!response.ok) throw new Error (`Error deleting product by id ${id}`);

@@ -27,15 +27,15 @@ export const OrdersContent = ({orders, setOrdersDateQuery, orderDatesQuery} : or
       className="h-full w-full overflow-auto"
       style={{ backgroundColor: colorPalette.DeepTwilight }}
     >
-      <div className="p-8">
+      <div className="p-4 pt-1">
         <div
           className="rounded-xl overflow-hidden shadow-2xl"
           style={{ backgroundColor: colorPalette.Charcoal }}
         >
-          <div className="py-4 flex flex-row items-center w-full px-8" style={{backgroundColor: colorPalette.DeepTwilight}}>
+          <div className="py-4 flex flex-row items-center w-full p-8" style={{backgroundColor: colorPalette.DeepTwilight}}>
 
-            <p className="border-0 text-white font-bold text-xl uppercase tracking-widest mr-5">Ordenes de: </p>
-            <input onChange={handleDateChange} className="border-0 cursor-pointer text-white font-bold text-xl uppercase tracking-widest" type="date" value={orderDatesQuery} />
+            <p className="border-0 text-white font-bold text-xl uppercase tracking-widest mr-5">Filtrar por fecha: </p>
+            <input onChange={handleDateChange} className="border-0 cursor-pointer text-white bg-[#121212] p-5 rounded-xl font-bold text-xl uppercase tracking-widest" type="date" value={orderDatesQuery} />
 
           </div>
           <div className="overflow-x-auto">

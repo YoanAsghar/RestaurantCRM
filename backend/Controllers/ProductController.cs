@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RestaurantCRM.Models;
@@ -7,6 +8,7 @@ namespace RestaurantCRM.Controllers;
 
 [Route("/api/v1/[controller]")]
 [ApiController]
+[Authorize]
 
 public class ProductController : ControllerBase
 {

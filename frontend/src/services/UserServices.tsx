@@ -3,6 +3,11 @@ import type { User } from "../models/user";
 
 const API_URL = `${config.apiRoute}/api/v1/User`
 
+export interface AuthSession {
+  userName: string;
+  role: string;
+}
+
 export const UserServices = {
   getAll: async(): Promise<User[]> => {
     const response = await fetch(API_URL, {
@@ -14,7 +19,7 @@ export const UserServices = {
     return await response.json();
   },
 
-  logIn: async(user: User): Promise<User> => {
+  logIn: async(user: User): Promise<AuthSession> => {
       const response = await fetch(`${API_URL}/login`, {
         method: "POST",
         credentials: "include",
@@ -22,13 +27,33 @@ export const UserServices = {
         body: JSON.stringify(user),
       });
 
-    if(response.ok){
-      return await response.json();
-    }
-    else{
+    if(!response.ok){
       const errorText = await response.text();
       throw new Error(errorText || "Unauthorized");
     }
+
+    return await response.json();
+  },
+
+  // Restores the current session from the auth cookie (used on app load / refresh).
+  getMe: async(): Promise<AuthSession> => {
+    const response = await fetch(`${API_URL}/me`, {
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if(!response.ok) throw new Error("Not authenticated");
+
+    return await response.json();
+  },
+
+  // Terminates the server-side session by clearing the auth cookie.
+  logOut: async(): Promise<void> => {
+    await fetch(`${API_URL}/logout`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    });
   },
 
   createUser: async(newUser: User): Promise<User> => {
@@ -43,27 +68,26 @@ export const UserServices = {
     return await response.json();
   },
 
-  editUser: async(userToEdit: User): Promise<User> => {
+  editUser: async(id: number, userToEdit: User): Promise<User> => {
 
-    const response = await fetch(API_URL, {
+    const response = await fetch(`${API_URL}/${id}`, {
       method: "PUT",
       credentials: "include",
       headers: { "Content-Type": "application/json"},
       body: JSON.stringify(userToEdit)
     })
-    if(!response.ok) throw new Error("Error creating user");
+    if(!response.ok) throw new Error("Error editing user");
 
     return await response.json();
   },
 
-  deleteUser: async(userToDelete: User): Promise<User> => {
-    const response = await fetch(API_URL, {
-      method: "PUT",
+  deleteUser: async(id: number): Promise<User> => {
+    const response = await fetch(`${API_URL}/${id}`, {
+      method: "DELETE",
       credentials: "include",
       headers: { "Content-Type": "application/json"},
-      body: JSON.stringify(userToDelete)
     })
-    if(!response.ok) throw new Error("Error creating user");
+    if(!response.ok) throw new Error("Error deleting user");
 
     return await response.json();
   }

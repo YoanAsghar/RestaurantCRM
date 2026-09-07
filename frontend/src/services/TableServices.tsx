@@ -5,14 +5,14 @@ const API_URL = `${config.apiRoute}/api/v1/Table`
 
 export const TableServices = {
   getAll: async (): Promise<Table[]> => {
-      const response = await fetch(API_URL);
+      const response = await fetch(API_URL, { credentials: "include" });
       if(!response.ok) throw new Error("Error fetching tables");
       
       const tables = await response.json();
 
-      return tables.map((table: Table, index: number) => ({
+      return tables.map((table: Table) => ({
         ...table,
-        id: index + 1
+        id: table.id as number
       }));
   },
 
@@ -22,6 +22,7 @@ export const TableServices = {
       headers: {
         "Content-Type": "application/json"
       },
+      credentials: "include",
       body: JSON.stringify({tableNumber: 0})
     })
     
@@ -30,10 +31,13 @@ export const TableServices = {
     return await response.json();
   },
 
-  deleteTable: async (): Promise<Table> => {
-      const response = await fetch(API_URL, {
+  deleteTable: async (id: number): Promise<Table> => {
+      const response = await fetch(`${API_URL}/${id}`, {
       method: 'DELETE',
+      credentials: "include",
       })
+
+      if(!response.ok) throw new Error("Error deleting table");
 
       return await response.json();
     }

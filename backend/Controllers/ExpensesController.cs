@@ -1,4 +1,5 @@
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RestaurantCRM.Data;
@@ -8,6 +9,7 @@ namespace RestaurantCRM.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
+[Authorize]
 public class ExpensesControllers : ControllerBase
 {
     private readonly ApplicationDbContext _context;

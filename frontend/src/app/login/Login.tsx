@@ -1,30 +1,31 @@
 import { UserServices } from "@/services/UserServices";
 import { User } from "@/models/user";
+import { useGlobalContext } from "../GlobalContext";
 import React, { useState } from "react";
 
-interface LoginProps {
-  isAuthenticated: boolean;
-  setIsAuthenticated: (boolean: boolean) => void;
-  setIsLoading: (isLoading: boolean) => void;
-  setUsername: (name: string) => void;
-  setRole: (name: string) => void;
-  role: string;
-};
-
-const Login = ({isAuthenticated, setIsAuthenticated, setIsLoading, setUsername, setRole, role}: LoginProps) => {
+const Login = () => {
+  const { setIsLoading, setUsername, setRole, setIsAuthenticated } = useGlobalContext();
   const [loginUsername, setLoginUsername] = useState<string>("");
   const [loginPassword, setLoginPassword] = useState<string>("");
+  const [error, setError] = useState<string>("");
 
   async function handleLoginButton(): Promise<void>{
+    setError("");
+    if (!loginUsername || !loginPassword) {
+      setError("Usuario y contraseña son requeridos");
+      return;
+    }
+
     setIsLoading(true);
     try{
       let response = await UserServices.logIn(new User(loginUsername, loginPassword));
-      
+
       setUsername(response.userName);
       setRole(response.role);
       setIsAuthenticated(true);
-    }catch(error){
-      // Silently handle or show a proper UI error message
+    }catch(e){
+      const msg = e instanceof Error ? e.message : "No se pudo iniciar sesión";
+      setError(msg || "Credenciales inválidas");
     }
     finally{
       setIsLoading(false);
@@ -57,6 +58,12 @@ const Login = ({isAuthenticated, setIsAuthenticated, setIsLoading, setUsername, 
         </div>
 
         <div className="space-y-8">
+          {error && (
+            <div className="bg-red-500/15 border border-red-500/40 text-red-300 text-sm rounded-2xl px-4 py-3">
+              {error}
+            </div>
+          )}
+
           {/* Input Usuario */}
           <div className="space-y-3">
             <label className="block text-sm font-medium text-light-200/80 ml-1 uppercase tracking-wider">

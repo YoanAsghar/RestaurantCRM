@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RestaurantCRM.Data;
@@ -21,9 +22,10 @@ namespace RestaurantCRM.Controllers
 
 
         //
-        // GET FOR THE USERS
+        // GET FOR THE USERS (any authenticated user)
         //
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<List<User>>> GetUsers()
         {
             var users = await _context.Users
@@ -40,9 +42,10 @@ namespace RestaurantCRM.Controllers
         }
 
         //
-        // POST FOR THE USERS CREATION
+        // POST FOR THE USERS CREATION (admin only)
         //
         [HttpPost]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult<User>> CreateUser([FromBody] User newUser)
         {
 
@@ -60,7 +63,11 @@ namespace RestaurantCRM.Controllers
                 return Conflict(new { message = "Username already exists" });
             }
 
-            newUser.Role = "user";
+            // An admin may assign a role; anyone else gets the default user role.
+            // Roles are normalized to lowercase canonical names.
+            newUser.Role = string.Equals(newUser.Role, Roles.Admin, StringComparison.OrdinalIgnoreCase)
+                ? Roles.Admin
+                : Roles.User;
             newUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newUser.PasswordHash, workFactor: 12);
 
             try
@@ -81,6 +88,7 @@ namespace RestaurantCRM.Controllers
         // POST FOR THE LOGIN
         //
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<ActionResult> Login([FromBody] User request)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == request.UserName);
@@ -103,11 +111,34 @@ namespace RestaurantCRM.Controllers
             return Ok(new { user.UserName, user.Role });
         }
 
+        //
+        // GET FOR THE CURRENT SESSION USER (restores auth state from the cookie)
+        //
+        [HttpGet("me")]
+        [Authorize]
+        public ActionResult<object> Me()
+        {
+            var userName = User.FindFirstValue(ClaimTypes.Name) ?? "";
+            var role = User.FindFirstValue(ClaimTypes.Role) ?? Roles.User;
+            return Ok(new { userName, role });
+        }
 
         //
-        // Editing user
+        // POST FOR THE LOGOUT (terminates the server-side session / clears cookie)
+        //
+        [HttpPost("logout")]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync("cookie");
+            return Ok(new { message = "Logged out" });
+        }
+
+        //
+        // Editing user (admin only)
         //
         [HttpPut("{id:int}")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult<User>> EditUser(int id, User editerUserData)
         {
             var UserToEdit = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
@@ -117,8 +148,12 @@ namespace RestaurantCRM.Controllers
             }
 
             UserToEdit.PaymentDate = editerUserData.PaymentDate;
-            UserToEdit.Role = editerUserData.Role;
+            // Roles are normalized to canonical names, preventing privilege escalation.
+            UserToEdit.Role = string.Equals(editerUserData.Role, Roles.Admin, StringComparison.OrdinalIgnoreCase)
+                ? Roles.Admin
+                : Roles.User;
             UserToEdit.Salary = editerUserData.Salary;
+            UserToEdit.PasswordHash = editerUserData.PasswordHash;
 
             try
             {
@@ -132,9 +167,10 @@ namespace RestaurantCRM.Controllers
         }
 
         //
-        // Deleting users
+        // Deleting users (admin only)
         //
         [HttpDelete("{id:int}")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult<User>> DeleteUser(int id)
         {
             var userToDelete = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);

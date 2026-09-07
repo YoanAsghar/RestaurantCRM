@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 export default function LoginPage() {
-  const { isAuthenticated, setIsAuthenticated, setIsLoading, setUsername, setRole, role } = useGlobalContext();
+  const { isAuthenticated } = useGlobalContext();
   const router = useRouter();
 
   useEffect(() => {
@@ -14,14 +14,5 @@ export default function LoginPage() {
     }
   }, [isAuthenticated, router]);
 
-  return (
-    <Login
-      isAuthenticated={isAuthenticated}
-      setIsAuthenticated={setIsAuthenticated}
-      setIsLoading={setIsLoading}
-      setUsername={setUsername}
-      setRole={setRole}
-      role={role}
-    />
-  );
+  return <Login />;
 }

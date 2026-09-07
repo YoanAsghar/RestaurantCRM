@@ -10,7 +10,7 @@ import TableInformation from "./tableInformation";
 import { useGlobalContext } from "../GlobalContext";
 
 export default function MesasPage() {
-  const { setIsLoading, isAuthenticated, role } = useGlobalContext();
+  const { setIsLoading, isAuthenticated, role, isAuthChecking } = useGlobalContext();
 
   // Table related status and functions
   const [tables, setTables] = useState<Table[]>([]);
@@ -24,8 +24,11 @@ export default function MesasPage() {
 
   // Retrieve all the created tables
   useEffect(() => {
-    TableServices.getAll().then(setTables);
-  }, [isAuthenticated]);
+    if (!isAuthenticated || isAuthChecking) return;
+    TableServices.getAll()
+      .then(setTables)
+      .catch(console.error);
+  }, [isAuthenticated, isAuthChecking]);
 
   const handleUpdateTable = useCallback((updatedTable: Table) => {
     setTables((prev) =>
@@ -53,7 +56,8 @@ export default function MesasPage() {
   const handleRemoveTable = async () => {
     setIsLoading(true);
     try {
-      await TableServices.deleteTable();
+      const selected = tables.find(t => t.id === currentTableSelectedId) ?? tables[0];
+      if (selected?.id) await TableServices.deleteTable(selected.id);
       const updatedTables = await TableServices.getAll();
       setTables(updatedTables);
     } catch (error) {
@@ -67,8 +71,11 @@ export default function MesasPage() {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    ProductServices.getAll().then(setProducts);
-  }, [isAuthenticated]);
+    if (!isAuthenticated || isAuthChecking) return;
+    ProductServices.getAll()
+      .then(setProducts)
+      .catch(console.error);
+  }, [isAuthenticated, isAuthChecking]);
 
   return (
     <div className="tab-content-wrapper flex flex-row w-full h-full">
@@ -86,7 +93,7 @@ export default function MesasPage() {
         key={currentTableSelectedId}
         table={selectedTable}
         onUpdateTable={handleUpdateTable}
-        setIsLoading={setIsLoading}
+         setIsLoading={setIsLoading}
       />
     </div>
   );
