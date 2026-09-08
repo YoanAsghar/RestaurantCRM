@@ -114,6 +114,7 @@ const TableInformation = ({table, onUpdateTable, setIsLoading, products }: Table
 
   async function handleProcessPayment() {
     if (!table) return;
+    if (currentProducts.length === 0) return;
 
     const finalOrder = new Order(table.id);
     finalOrder.totalPrice = totalPrice;
@@ -131,10 +132,8 @@ const TableInformation = ({table, onUpdateTable, setIsLoading, products }: Table
       setIsLoading(false);
     }
 
-    onUpdateTable({
-      ...table,
-      order: finalOrder
-    });
+    // The backend clears the table's open order and broadcasts OrderClosed,
+    // so the global state removes it — no need to re-push the paid order here.
     resetTableData();
   }
 
@@ -150,16 +149,6 @@ const TableInformation = ({table, onUpdateTable, setIsLoading, products }: Table
         </div>
 
         <div className="flex flex-wrap gap-4">
-          <div className="flex items-center gap-2">
-            <label className="text-white text-sm">Personas:</label>
-            <input
-              type="text"
-              value={amountOfPersons}
-              onChange={(e) => handlePersonsChange(Number(e.target.value) || 0)}
-              className="bg-black text-white text-center w-16 h-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-          </div>
-
           <div className="flex items-center gap-2">
             <label className="text-white text-sm">Propina:</label>
             <input

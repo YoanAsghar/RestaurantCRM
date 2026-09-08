@@ -32,7 +32,14 @@ builder.Services.AddControllers()
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSignalR();
+builder.Services.AddSignalR()
+    .AddJsonProtocol(options =>
+    {
+        // Match the MVC serializer so hub payloads ship enums as strings too
+        // (e.g. OrderStatus "OPEN"/"PAID"), keeping frontend models identical
+        // whether the data came from a REST call or the real-time hub.
+        options.PayloadSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

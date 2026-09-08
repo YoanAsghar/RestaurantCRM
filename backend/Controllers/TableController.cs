@@ -5,6 +5,7 @@ using RestaurantCRM.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.SignalR;
 using RestaurantCRM.Hubs;
+using RestaurantCRM.Services;
 
 namespace RestaurantCRM.Controllers;
 
@@ -25,9 +26,26 @@ public class TableController : ControllerBase
     // GET FOR THE ORDERS
     //
     [HttpGet]
-    public async Task<ActionResult<List<Table>>> GetTables()
+    public async Task<ActionResult<List<TableResponseDto>>> GetTables()
     {
-        return Ok(await _context.Tables.ToListAsync());
+        var tables = await _context.Tables.AsNoTracking().ToListAsync();
+
+        // Attach each table's current OPEN order (if any) so every client
+        // boots with the same "who has an active order" picture.
+        var openOrders = await OrderProjection.Project(_context.Orders
+            .Where(o => o.Status == OrderStatus.OPEN && o.TableId != null))
+            .ToListAsync();
+
+        var openByTable = openOrders.ToDictionary(o => o.TableId!.Value);
+
+        var result = tables.Select(t => new TableResponseDto
+        {
+            Id = t.Id,
+            TableNumber = t.TableNumber,
+            Order = openByTable.TryGetValue(t.Id, out var order) ? order : null
+        }).ToList();
+
+        return Ok(result);
     }
 
     //
@@ -60,9 +78,22 @@ public class TableController : ControllerBase
 
         _context.Tables.Remove(tableToDelete);
 
+        // Removing a table must also clear its in-progress order so no orphan
+        // OPEN order lingers in /Order/active (and therefore in Cocina).
+        var openOrder = await _context.Orders
+            .FirstOrDefaultAsync(o => o.TableId == id && o.Status == OrderStatus.OPEN);
+        if (openOrder != null)
+        {
+            _context.Orders.Remove(openOrder);
+        }
+
         try
         {
             await _context.SaveChangesAsync();
+            if (openOrder != null)
+            {
+                await _hubContext.Clients.All.SendAsync(HubEvents.OrderClosed, new { tableId = id });
+            }
             return Ok(tableToDelete);
         }
         catch (Exception ex)

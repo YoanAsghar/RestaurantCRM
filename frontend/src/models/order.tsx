@@ -6,6 +6,11 @@ export enum PaymentMethod{
   BANK_TRANS = "BANK_TRANS"
 }
 
+export enum OrderStatus{
+  OPEN = "OPEN",
+  PAID = "PAID"
+}
+
 export class Order{
   public static OrderInstances: Order[] = [];
 
@@ -15,6 +20,7 @@ export class Order{
   guests: number;
   tip: number;
   paymentMethod: PaymentMethod;
+  status: OrderStatus;
   tableId: number;
   orderDetail: orderDetail[];
 
@@ -27,6 +33,7 @@ export class Order{
     this.guests = 0;
     this.tip = 0;
     this.paymentMethod = PaymentMethod.CASH;
+    this.status = OrderStatus.OPEN;
   }
 
   public static getAllOrderInstances(){

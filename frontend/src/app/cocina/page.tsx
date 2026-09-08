@@ -1,23 +1,15 @@
 'use client';
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import KitchenView from './KitchenView';
-import { TableServices } from '../../services/TableServices';
-import { useGlobalContext } from '../GlobalContext';
-import { Table } from '../../models/table';
+import { useOrdersContext } from '../OrdersContext';
 
 export default function CocinaPage() {
-  const { isAuthenticated } = useGlobalContext();
-  const [tables, setTables] = useState<Table[]>([]);
-
-  useEffect(() => {
-    TableServices.getAll().then(setTables);
-  }, [isAuthenticated]);
+  // Live global state of every current order, kept in sync by the SignalR hub.
+  const { openOrders } = useOrdersContext();
 
   const activeOrders = useMemo(() => {
-    return tables
-      .filter((t) => t.order && t.order.orderDetail.length > 0)
-      .map((t) => t.order!);
-  }, [tables]);
+    return openOrders.filter((order) => order.orderDetail.length > 0);
+  }, [openOrders]);
 
-  return <KitchenView activeOrders={activeOrders}/>;
+  return <KitchenView activeOrders={activeOrders} />;
 }

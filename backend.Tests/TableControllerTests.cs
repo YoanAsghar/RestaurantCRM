@@ -119,4 +119,37 @@ public class TableControllerTests : IDisposable
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         Assert.Single(tables!);
     }
+
+    [Fact]
+    public async Task GetTables_IncludesTheOpenOrderPerTable()
+    {
+        var table = await CreateTableAsync(1);
+        var tableId = table.GetProperty("id").GetInt32();
+
+        var productResponse = await _client.PostAsJsonAsync("/api/v1/Product",
+            new { name = "Pasta", price = 9.5, category = "Food", description = "test", image = "" });
+        productResponse.EnsureSuccessStatusCode();
+        var product = await productResponse.Content.ReadFromJsonAsync<JsonElement>();
+        var pid = product.GetProperty("id").GetInt32();
+
+        var orderResponse = await _client.PutAsJsonAsync($"/api/v1/Order/table/{tableId}", new
+        {
+            tableId,
+            guests = 4,
+            tip = 2,
+            paymentMethod = "CASH",
+            orderDetail = new[] { new { productId = pid, quantity = 2 } }
+        });
+        orderResponse.EnsureSuccessStatusCode();
+
+        var response = await _client.GetAsync("/api/v1/Table");
+        var tables = await response.Content.ReadFromJsonAsync<JsonElement[]>();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.True(tables![0].TryGetProperty("order", out var order),
+            "GetTables must include each table's open order");
+        Assert.Equal(4, order.GetProperty("guests").GetInt32());
+        Assert.Equal(21.0, order.GetProperty("totalPrice").GetDouble());
+        Assert.Equal(2, order.GetProperty("orderDetail")[0].GetProperty("quantity").GetInt32());
+    }
 }

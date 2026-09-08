@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using RestaurantCRM.Data;
 using Microsoft.AspNetCore.SignalR;
 using RestaurantCRM.Hubs;
+using RestaurantCRM.Services;
 
 namespace RestaurantCRM.Controllers;
 
@@ -13,7 +14,6 @@ namespace RestaurantCRM.Controllers;
 [Authorize]
 public class OrderController : ControllerBase
 {
-    // database and hub context
     private readonly ApplicationDbContext _context;
     private readonly IHubContext<RestaurantHub> _hubContext;
 
@@ -24,7 +24,9 @@ public class OrderController : ControllerBase
     }
 
     //
-    // GET FOR THE ORDERS BY ID PAGE AND SIZE
+    // GET /api/v1/Order?date=yyyy-MM-dd
+    // Completed (PAID) orders for a given day, enriched with items + products.
+    // Drives the Ordenes history page. Open/in-progress orders are excluded.
     //
     [HttpGet]
     public async Task<ActionResult<List<Order>>> GetOrders([FromQuery] DateOnly? date)
@@ -34,37 +36,9 @@ public class OrderController : ControllerBase
         var startDay = filterDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
         var endDay = startDay.AddDays(1);
 
-        var orders = await _context.Orders
-                  .Where(o => o.OrderDate >= startDay && o.OrderDate < endDay)
-                  .AsNoTracking()
-                  .Include(o => o.OrderDetail)
-                  .ThenInclude(od => od.Product)
-                  .Select(o => new Order
-                  {
-                      Id = o.Id,
-                      TotalPrice = o.TotalPrice,
-                      OrderDate = o.OrderDate,
-                      Guests = o.Guests,
-                      Tip = o.Tip,
-                      PaymentMethod = o.PaymentMethod,
-                      TableId = o.TableId,
-                      OrderDetail = o.OrderDetail.Select(od => new OrderDetail
-                      {
-                          Id = od.Id,
-                          OrderId = od.OrderId,
-                          ProductId = od.ProductId,
-                          Product = new Product
-                          {
-                              Id = od.Product!.Id,
-                              Name = od.Product.Name,
-                              Price = od.Product.Price,
-                              Category = od.Product.Category,
-                              Description = od.Product.Description,
-                              Image = null
-                          },
-                          Quantity = od.Quantity
-                      }).ToList()
-                  })
+        var orders = await OrderProjection.Project(_context.Orders
+                  .Where(o => o.Status == OrderStatus.PAID)
+                  .Where(o => o.OrderDate >= startDay && o.OrderDate < endDay))
                   .OrderByDescending(o => o.Id)
                   .ToListAsync();
 
@@ -72,17 +46,167 @@ public class OrderController : ControllerBase
     }
 
     //
-    // POST FOR THE ORDERS
+    // GET /api/v1/Order/active
+    // All current (OPEN) orders across tables, enriched with items + products.
+    // Seeds the global real-time state; the hub keeps it fresh afterwards.
+    //
+    [HttpGet("active")]
+    public async Task<ActionResult<List<Order>>> GetActiveOrders()
+    {
+        var orders = await OrderProjection.Project(_context.Orders
+                  .Where(o => o.Status == OrderStatus.OPEN))
+                  .OrderBy(o => o.TableId)
+                  .ToListAsync();
+
+        return Ok(orders);
+    }
+
+    //
+    // PUT /api/v1/Order/table/{tableId}
+    // Upserts the OPEN order for a table. Empty payload clears it. Broadcasts
+    // OrderUpdated/OrderClosed to every connected client so Mesas + Cocina sync.
+    //
+    [HttpPut("table/{tableId:int}")]
+    public async Task<ActionResult<Order>> SaveOpenOrder(int tableId, [FromBody] SaveOpenOrderRequest request)
+    {
+        var tableExists = await _context.Tables.AnyAsync(t => t.Id == tableId);
+        if (!tableExists)
+        {
+            return NotFound($"Table with id {tableId} doesn't exist");
+        }
+
+        var details = request.OrderDetail ?? new List<SaveOrderDetailRequest>();
+        if (details.Any(d => d.ProductId <= 0 || d.Quantity <= 0))
+        {
+            return BadRequest("Order items must have a valid productId and a positive quantity");
+        }
+
+        if (details.Count == 0)
+        {
+            return await ClearOpenOrder(tableId);
+        }
+
+        var existingOrders = await _context.Orders
+            .Include(o => o.OrderDetail)
+            .Where(o => o.TableId == tableId && o.Status == OrderStatus.OPEN)
+            .ToListAsync();
+        var existing = existingOrders.FirstOrDefault();
+
+        // Defensive: collapse any stray duplicates into a single OPEN order per
+        // table (races/pre-existing data could have created more than one).
+        foreach (var duplicate in existingOrders.Skip(1))
+        {
+            _context.Orders.Remove(duplicate);
+        }
+
+        var productIds = details.Select(d => d.ProductId).Distinct().ToList();
+        var products = await _context.Products
+            .Where(p => productIds.Contains(p.Id))
+            .AsNoTracking()
+            .ToDictionaryAsync(p => p.Id);
+
+        if (products.Count != productIds.Count)
+        {
+            return BadRequest("One or more products don't exist");
+        }
+
+        if (existing == null)
+        {
+            existing = new Order
+            {
+                TableId = tableId,
+                Status = OrderStatus.OPEN,
+                OrderDate = DateTime.UtcNow
+            };
+            _context.Orders.Add(existing);
+        }
+
+        existing.Guests = request.Guests;
+        existing.Tip = request.Tip;
+        existing.PaymentMethod = request.PaymentMethod;
+        existing.TotalPrice = details.Sum(d => (float)(products[d.ProductId].Price * d.Quantity)) + request.Tip;
+
+        _context.OrdersDetails.RemoveRange(existing.OrderDetail);
+        existing.OrderDetail = details.Select(d => new OrderDetail
+        {
+            ProductId = d.ProductId,
+            Quantity = d.Quantity
+        }).ToList();
+
+        await _context.SaveChangesAsync();
+
+        var enriched = await OrderProjection.Project(_context.Orders.Where(o => o.Id == existing.Id))
+            .SingleOrDefaultAsync();
+
+        await _hubContext.Clients.All.SendAsync(HubEvents.OrderUpdated, enriched);
+
+        return Ok(enriched);
+    }
+
+    //
+    // POST /api/v1/Order
+    // The waiter pays for a table: the order is persisted as PAID, the table's
+    // OPEN order is cleared and every client is told the table is now free.
     //
     [HttpPost]
     public async Task<ActionResult> CreateOrder(Order order)
     {
+        if (order.OrderDetail == null || order.OrderDetail.Count == 0)
+        {
+            return BadRequest("At least one order item is required");
+        }
+        if (order.OrderDetail.Any(od => od.ProductId <= 0 || od.Quantity <= 0))
+        {
+            return BadRequest("Order items must have a valid productId and a positive quantity");
+        }
+        if (order.Guests < 0 || order.Tip < 0)
+        {
+            return BadRequest("Guests and tip cannot be negative");
+        }
+
+        order.Id = 0;
+        order.Status = OrderStatus.PAID;
+
         _context.Orders.Add(order);
+
+        if (order.TableId is int tableId)
+        {
+            var openOrders = await _context.Orders
+                .Include(o => o.OrderDetail)
+                .Where(o => o.TableId == tableId && o.Status == OrderStatus.OPEN)
+                .ToListAsync();
+            if (openOrders.Count > 0)
+            {
+                _context.Orders.RemoveRange(openOrders);
+            }
+        }
+
         await _context.SaveChangesAsync();
+
+        if (order.TableId is int paidTableId)
+        {
+            await _hubContext.Clients.All.SendAsync(HubEvents.OrderClosed, new { tableId = paidTableId });
+        }
+
         return Ok(order);
     }
 
-    //
-    // PUT FOR THE ORDERS
-    //
+    private async Task<ActionResult<Order>> ClearOpenOrder(int tableId)
+    {
+        var openOrders = await _context.Orders
+            .Include(o => o.OrderDetail)
+            .Where(o => o.TableId == tableId && o.Status == OrderStatus.OPEN)
+            .ToListAsync();
+
+        if (openOrders.Count > 0)
+        {
+            _context.Orders.RemoveRange(openOrders);
+            await _context.SaveChangesAsync();
+        }
+
+        await _hubContext.Clients.All.SendAsync(HubEvents.OrderClosed, new { tableId });
+
+        return Ok(new { tableId });
+    }
+
 }

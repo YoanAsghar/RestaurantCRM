@@ -5,15 +5,16 @@ Una solución integral para la gestión de restaurantes, permitiendo el control 
 ## 🚀 Tecnologías Utilizadas
 
 ### Frontend
-- **React 18** (TypeScript)
-- **Vite** (Build tool)
-- **Tailwind CSS** (Estilos personalizados y paleta de colores dinámica)
-- **Lucide React** (Iconografía)
+- **Next.js 16 (App Router)** (React 19 + TypeScript)
+- **Tailwind CSS v4** (Estilos personalizados y paleta de colores dinámica)
+- **@microsoft/signalr** (Sincronización en tiempo real)
+- **Lucide / Lucide React** (Iconografía)
 
 ### Backend
-- **.NET 8 Web API**
+- **.NET 10 Web API**
 - **Entity Framework Core**
 - **PostgreSQL** (Base de Datos)
+- **SignalR** (WebSockets)
 - **Swagger/OpenAPI** (Documentación de API)
 
 ---
@@ -29,12 +30,21 @@ Una solución integral para la gestión de restaurantes, permitiendo el control 
 - Selección de productos desde el inventario.
 - Múltiples métodos de pago (Efectivo, Tarjeta, Transferencia).
 
-### 3. Inventario (Productos)
+### 3. Cocina
+- Todos los pedidos **activos** (mesas con orden abierta) llegan a Cocina al instante.
+- Se actualizan en vivo conforme los meseros agregan/quitan productos.
+
+### 4. Inventario (Productos)
 - CRUD completo de productos.
 - Búsqueda filtrada de artículos.
 
-### 4. Historial de Órdenes
+### 5. Historial de Órdenes
 - Registro detallado de transacciones con paginación.
+
+### 6. Sincronización en Tiempo Real
+- Los pedidos abiertos viven en el backend (`Status = OPEN`) y se comparten entre **todos los clientes** vía WebSockets (SignalR).
+- Cada cambio de un mesero (agregar/quitar productos, comensales, propina) emite `OrderUpdated`; pagar emite `OrderClosed`.
+- Mesas y Cocina leen un **estado global de órdenes** (`OrdersContext`) alimentado por el hub, así que todos ven lo mismo al instante, sin refrescar.
 
 ---
 
