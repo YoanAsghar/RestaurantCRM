@@ -1,7 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useMemo, useEffect, useCallback } from 'react';
-import { UserServices } from '../services/UserServices';
+import React, { createContext, useContext, useState } from 'react';
 
 interface GlobalContextType {
   isAuthenticated: boolean;
@@ -12,8 +11,6 @@ interface GlobalContextType {
   setRole: (val: string) => void;
   isLoading: boolean;
   setIsLoading: (val: boolean) => void;
-  isAuthChecking: boolean;
-  logout: () => Promise<void>;
 }
 
 const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
@@ -23,56 +20,20 @@ export function GlobalProvider({ children }: { children: React.ReactNode }) {
   const [username, setUsername] = useState("");
   const [role, setRole] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  // True while we verify the persisted session on first load; the app must not
-  // redirect to /login before this resolves.
-  const [isAuthChecking, setIsAuthChecking] = useState(true);
-
-  // On mount, restore the session from the AuthorizationCookies cookie via /me.
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      try {
-        const session = await UserServices.getMe();
-        if (!active) return;
-        setUsername(session.userName);
-        setRole(session.role);
-        setIsAuthenticated(true);
-      } catch {
-        // No valid session — stay logged out.
-      } finally {
-        if (active) setIsAuthChecking(false);
-      }
-    })();
-    return () => { active = false; };
-  }, []);
-
-  // Logs out on the backend (clears the auth cookie) and resets local state.
-  const logout = useCallback(async () => {
-    try {
-      await UserServices.logOut();
-    } catch {
-      // Ignore network errors during logout; still reset local state.
-    }
-    setIsAuthenticated(false);
-    setUsername("");
-    setRole("");
-  }, []);
-
-  const value = useMemo(() => ({
-    isAuthenticated,
-    setIsAuthenticated,
-    username,
-    setUsername,
-    role,
-    setRole,
-    isLoading,
-    setIsLoading,
-    isAuthChecking,
-    logout,
-  }), [isAuthenticated, username, role, isLoading, isAuthChecking, logout]);
 
   return (
-    <GlobalContext.Provider value={value}>
+    <GlobalContext.Provider
+      value={{
+        isAuthenticated,
+        setIsAuthenticated,
+        username,
+        setUsername,
+        role,
+        setRole,
+        isLoading,
+        setIsLoading,
+      }}
+    >
       {children}
     </GlobalContext.Provider>
   );

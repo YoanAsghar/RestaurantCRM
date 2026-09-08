@@ -4,7 +4,6 @@ import "./globals.css";
 import "../index.css";
 import RootClientLayout from "./RootClientLayout";
 import { GlobalProvider } from "./GlobalContext";
-import { OrdersProvider } from "./OrdersContext";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -26,11 +25,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${dmSans.variable} font-dm-sans antialiased`}>
         <GlobalProvider>
-          <OrdersProvider>
-            <RootClientLayout>
-              {children}
-            </RootClientLayout>
-          </OrdersProvider>
+          <RootClientLayout>
+            {children}
+          </RootClientLayout>
         </GlobalProvider>
       </body>
     </html>

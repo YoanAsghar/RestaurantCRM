@@ -28,18 +28,11 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
     });
 
-
+// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSignalR()
-    .AddJsonProtocol(options =>
-    {
-        // Match the MVC serializer so hub payloads ship enums as strings too
-        // (e.g. OrderStatus "OPEN"/"PAID"), keeping frontend models identical
-        // whether the data came from a REST call or the real-time hub.
-        options.PayloadSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
-    });
+builder.Services.AddSignalR();
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -122,7 +115,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapHub<RestaurantHub>("/hub");
+app.MapHub<RestaurantCRM.Hubs.OrdersHub>("/ordersHub");
 
 app.Run();
 

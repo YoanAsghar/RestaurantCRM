@@ -17,7 +17,7 @@ const TableInformation = ({table, onUpdateTable, setIsLoading, products }: Table
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.CASH);
   const [amountOfPersons, setAmountOfPersons] = useState(table?.order?.guests || 0);
   const [propina, setPropina] = useState(table?.order?.tip || 0);
-  const [currentTab, setCurrenTab] = useState(false);
+  const [currentTab, setCurrenTab] = useState(true);
   const [searchBarValue, setSearchBarValue] = useState("");
   const [currentProducts, setCurrentProducts] = useState<orderDetail[]>([]);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -114,7 +114,6 @@ const TableInformation = ({table, onUpdateTable, setIsLoading, products }: Table
 
   async function handleProcessPayment() {
     if (!table) return;
-    if (currentProducts.length === 0) return;
 
     const finalOrder = new Order(table.id);
     finalOrder.totalPrice = totalPrice;
@@ -132,8 +131,10 @@ const TableInformation = ({table, onUpdateTable, setIsLoading, products }: Table
       setIsLoading(false);
     }
 
-    // The backend clears the table's open order and broadcasts OrderClosed,
-    // so the global state removes it — no need to re-push the paid order here.
+    onUpdateTable({
+      ...table,
+      order: finalOrder
+    });
     resetTableData();
   }
 
@@ -149,6 +150,16 @@ const TableInformation = ({table, onUpdateTable, setIsLoading, products }: Table
         </div>
 
         <div className="flex flex-wrap gap-4">
+          <div className="flex items-center gap-2">
+            <label className="text-white text-sm">Personas:</label>
+            <input
+              type="text"
+              value={amountOfPersons}
+              onChange={(e) => handlePersonsChange(Number(e.target.value) || 0)}
+              className="bg-black text-white text-center w-16 h-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+            />
+          </div>
+
           <div className="flex items-center gap-2">
             <label className="text-white text-sm">Propina:</label>
             <input
@@ -237,11 +248,11 @@ const TableInformation = ({table, onUpdateTable, setIsLoading, products }: Table
               </button>
             </div>
 
-            <div className="relative w-full px-15 mt-3 mb-4">
+            <div className="relative w-full px-4 mb-4">
               <img 
                 src="/search_icon.png" 
                 alt="Buscar" 
-                className="absolute left-7 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none brightness-0 invert"
+                className="absolute left-7 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none brightness-0"
               />
               <input 
                 onChange={(e) => setSearchBarValue(e.target.value.toLowerCase())}
@@ -250,9 +261,9 @@ const TableInformation = ({table, onUpdateTable, setIsLoading, products }: Table
                 className="w-full bg-white text-black rounded-lg p-3 pl-14 border-none focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
-            <ul className="flex-1 flex flex-col w-full overflow-y-auto px-15 gap-2 pb-4">
+            <ul className="flex-1 flex flex-col w-full overflow-y-auto px-4 gap-2 pb-4">
               {filteredProducts.map((product) => (
-                <li key={product.id} className="flex flex-row justify-between items-center rounded-lg text-black p-3 bg-white shadow-sm hover:bg-gray-50 transition-colors">
+                <li key={product.id + Math.random()} className="flex flex-row justify-between items-center rounded-lg text-black p-3 bg-white shadow-sm hover:bg-gray-50 transition-colors">
                   <div className="flex flex-col">
                     <p className="font-bold text-lg leading-tight">{product.name}</p>
                     <p className="text-sm opacity-60 font-medium">${product.price}</p>

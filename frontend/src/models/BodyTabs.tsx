@@ -2,7 +2,7 @@ export enum BodyTabs {
   mesas = "mesas",
   cocina = "cocina",
   ordenes = "ordenes",
-  carta = "carta",
+  inventario = "inventario",
   domicilios = "domicilios",
   admin = "admin"
 }

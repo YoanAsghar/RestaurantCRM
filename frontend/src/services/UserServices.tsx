@@ -27,7 +27,10 @@ export const UserServices = {
         body: JSON.stringify(user),
       });
 
-    if(!response.ok){
+    if(response.ok){
+      return await response.json();
+    }
+    else{
       const errorText = await response.text();
       throw new Error(errorText || "Unauthorized");
     }

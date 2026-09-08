@@ -15,7 +15,9 @@ const Navbar = ({role, username, setTabChange, onLogout} : SideBarProps) => {
   const router = useRouter();
 
   function handleLogout(){
-    onLogout();
+    setIsAuthenticated(false);
+    setUsername("");
+    setRole("");
     router.push("/");
   }
 

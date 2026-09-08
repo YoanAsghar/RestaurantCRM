@@ -5,7 +5,6 @@ using RestaurantCRM.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.SignalR;
 using RestaurantCRM.Hubs;
-using RestaurantCRM.Services;
 
 namespace RestaurantCRM.Controllers;
 
@@ -15,9 +14,9 @@ namespace RestaurantCRM.Controllers;
 public class TableController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
-    private readonly IHubContext<RestaurantHub> _hubContext;
+    private readonly IHubContext<TablesHub> _hubContext;
 
-    public TableController(ApplicationDbContext context, IHubContext<RestaurantHub> hubContext)
+    public TableController(ApplicationDbContext context, IHubContext<TablesHub> hubContext)
     {
         _context = context;
         _hubContext = hubContext;
